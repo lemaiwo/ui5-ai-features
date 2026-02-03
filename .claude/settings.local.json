@@ -16,7 +16,16 @@
       "Bash(npx cds watch:*)",
       "Bash(curl:*)",
       "Bash(netstat:*)",
-      "Bash(ss:*)"
+      "Bash(ss:*)",
+      "Bash(cf target)",
+      "Bash(npx cds:*)",
+      "Bash(cf login:*)",
+      "Bash(npm run watch-hybrid:*)",
+      "Bash(for i in 1 2 3 4 5 6 7 8)",
+      "Bash(do perl -e \"select\\(undef,undef,undef,1\\)\")",
+      "Bash(done)",
+      "mcp__ui5__run_manifest_validation",
+      "Bash(for i in 1 2 3)"
     ]
   }
 }

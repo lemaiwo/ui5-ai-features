@@ -118,8 +118,7 @@
         "transition": "slide",
         "type": "View",
         "viewType": "XML",
-        "path": "com.eliagroup.ai.aidemo.view",
-        "viewPath": "com.eliagroup.ai.aidemo.view"
+        "path": "com.eliagroup.ai.aidemo.view"
       },
       "routes": [
         {

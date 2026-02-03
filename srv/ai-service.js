@@ -17,34 +17,30 @@ module.exports = class AIService extends cds.ApplicationService {
 
     try {
       const orchestrationClient = new OrchestrationClient({
-        llm: {
-          model_name: "gpt-4o",
-          model_params: {
-            max_tokens: 4096,
-            temperature: 0.7
-          }
-        },
-        templating: {
-          template: [
-            {
-              role: "system",
-              content:
-                "You are a helpful AI assistant that processes text according to user instructions. " +
-                "Only return the processed text without any additional explanation or commentary."
-            },
-            {
-              role: "user",
-              content: "{{?instruction}}\n\nText to process:\n{{?text}}"
+        promptTemplating: {
+          model: {
+            name: "gpt-4o",
+            params: {
+              max_tokens: 4096,
+              temperature: 0.7
             }
-          ]
+          }
         }
       });
 
       const response = await orchestrationClient.chatCompletion({
-        inputParams: {
-          instruction: prompt,
-          text: text
-        }
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a helpful AI assistant that processes text according to user instructions. " +
+              "Only return the processed text without any additional explanation or commentary."
+          },
+          {
+            role: "user",
+            content: `${prompt}\n\nText to process:\n${text}`
+          }
+        ]
       });
 
       return response.getContent();

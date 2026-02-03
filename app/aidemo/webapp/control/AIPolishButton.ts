@@ -11,6 +11,7 @@ import BusyIndicator from "sap/ui/core/BusyIndicator";
 import type { Button$PressEvent } from "sap/m/Button";
 import ODataModel from "sap/ui/model/odata/v4/ODataModel";
 import type { MetadataOptions } from "sap/ui/base/ManagedObject";
+import Component from "sap/ui/core/Component";
 
 /**
  * AIPolishButton - A button that opens a dialog to polish text using AI
@@ -151,15 +152,7 @@ export default class AIPolishButton extends Button {
         press: () => {
           this._dialog?.close();
         }
-      }),
-      buttons: [
-        new Button({
-          text: "Copy Result",
-          icon: "sap-icon://copy",
-          press: this._onCopyPress.bind(this),
-          visible: false
-        }).addStyleClass("aiPolishCopyButton")
-      ]
+      })
     });
 
     this.addDependent(this._dialog);
@@ -174,10 +167,14 @@ export default class AIPolishButton extends Button {
     }
 
     const aiModelName = this.getProperty("aiModelName") as string;
-    const model = this.getModel(aiModelName) as ODataModel;
+
+    // Get model from component since custom controls may not have model propagation
+    const ownerComponent = Component.getOwnerComponentFor(this);
+    const model = (ownerComponent?.getModel(aiModelName) || this.getModel(aiModelName)) as ODataModel;
 
     if (!model) {
-      MessageToast.show(`AI model '${aiModelName}' not found`);
+      MessageToast.show(`AI model '${aiModelName}' not found. Please ensure the model is configured in manifest.json`);
+      console.error(`Model '${aiModelName}' not found. Available models on component:`, ownerComponent?.getManifest());
       return;
     }
 
@@ -194,12 +191,6 @@ export default class AIPolishButton extends Button {
       const polishedText = result?.value || "";
 
       this._outputTextArea?.setValue(polishedText);
-
-      // Show copy button
-      const copyButton = this._dialog?.getButtons()[0];
-      if (copyButton) {
-        copyButton.setVisible(true);
-      }
 
       this.fireEvent("textPolished", {
         originalText: inputText,

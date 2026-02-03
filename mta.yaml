@@ -72,7 +72,7 @@ resources:
   type: org.cloudfoundry.managed-service
   parameters:
     service: aicore
-    service-name: 110_BC_AICORE_EXTENDED
+    service-name: 111_BC_AICORE_EXTENDED
     service-plan: extended
 - name: bc-aiui-features-auth
   type: org.cloudfoundry.managed-service
