@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(find:*)",
+      "mcp__cds-mcp__search_docs",
+      "mcp__ui5__get_guidelines",
+      "Bash(npm search:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:sap.github.io)",
+      "Bash(npm install:*)",
+      "Bash(npx cds compile:*)",
+      "Bash(npx tsc:*)",
+      "mcp__ui5__run_ui5_linter",
+      "Bash(npx cds watch:*)",
+      "Bash(curl:*)",
+      "Bash(netstat:*)",
+      "Bash(ss:*)"
+    ]
+  }
+}

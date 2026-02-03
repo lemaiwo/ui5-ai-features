@@ -1,0 +1,34 @@
+<mvc:View controllerName="com.eliagroup.ai.aidemo.controller.Main"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:ai="com.eliagroup.ai.aidemo.control">
+    <Page id="page" title="{i18n>title}">
+        <headerContent>
+            <ai:AIPolishButton
+                id="polishButton"
+                text="Polish Text"
+                dialogTitle="Polish Text with AI"
+                prompt="Polish and improve this text. Fix grammar, improve clarity, and make it more professional while keeping the original meaning."
+                aiModelName="ai" />
+        </headerContent>
+        <content>
+            <VBox class="sapUiMediumMargin">
+                <Title text="AI-Powered Text Tools" level="H2" class="sapUiSmallMarginBottom" />
+                <Text text="Use the AI controls in the header to process text with artificial intelligence." class="sapUiSmallMarginBottom" />
+
+                <Panel headerText="Available AI Controls" class="sapUiSmallMarginTop">
+                    <VBox class="sapUiSmallMargin">
+                        <HBox alignItems="Center" class="sapUiTinyMarginBottom">
+                            <ai:AIPolishButton
+                                id="demoPolishButton"
+                                text="Polish Text"
+                                aiModelName="ai"
+                                class="sapUiTinyMarginEnd" />
+                            <Text text="Opens a dialog to polish and improve your text using AI" />
+                        </HBox>
+                    </VBox>
+                </Panel>
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>
