@@ -1,0 +1,20 @@
+{
+  "requires": {
+    "[hybrid]": {
+      "auth": "mocked",
+      "AICORE": {
+        "binding": {
+          "type": "cf",
+          "apiEndpoint": "https://api.cf.eu10.hana.ondemand.com",
+          "org": "eliagroup-111-dev",
+          "space": "111_BC",
+          "instance": "111_BC_AICORE_EXTENDED",
+          "key": "111_BC_AICORE_EXTENDED-key"
+        },
+        "vcap": {
+          "name": "AICORE"
+        }
+      }
+    }
+  }
+}
