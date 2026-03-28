@@ -10,6 +10,12 @@
                 dialogTitle="Polish Text with AI"
                 prompt="Polish and improve this text. Fix grammar, improve clarity, and make it more professional while keeping the original meaning."
                 aiModelName="ai" />
+            <ai:AISummarizeButton
+                id="summarizeButton"
+                text="Summarize Text"
+                dialogTitle="Summarize Text with AI"
+                prompt="Summarize the following text concisely. Capture the key points and main ideas in a clear, brief summary."
+                aiModelName="ai" />
         </headerContent>
         <content>
             <VBox class="sapUiMediumMargin">
@@ -25,6 +31,14 @@
                                 aiModelName="ai"
                                 class="sapUiTinyMarginEnd" />
                             <Text text="Opens a dialog to polish and improve your text using AI" />
+                        </HBox>
+                        <HBox alignItems="Center" class="sapUiTinyMarginBottom">
+                            <ai:AISummarizeButton
+                                id="demoSummarizeButton"
+                                text="Summarize Text"
+                                aiModelName="ai"
+                                class="sapUiTinyMarginEnd" />
+                            <Text text="Opens a dialog to summarize long text into key points using AI" />
                         </HBox>
                     </VBox>
                 </Panel>
