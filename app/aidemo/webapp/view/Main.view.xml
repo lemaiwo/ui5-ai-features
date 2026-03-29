@@ -16,6 +16,11 @@
                 dialogTitle="Summarize Text with AI"
                 prompt="Summarize the following text concisely. Capture the key points and main ideas in a clear, brief summary."
                 aiModelName="ai" />
+            <ai:AITranslateButton
+                id="translateButton"
+                text="Translate Text"
+                dialogTitle="Translate Text with AI"
+                aiModelName="ai" />
         </headerContent>
         <content>
             <VBox class="sapUiMediumMargin">
@@ -40,6 +45,50 @@
                                 class="sapUiTinyMarginEnd" />
                             <Text text="Opens a dialog to summarize long text into key points using AI" />
                         </HBox>
+                        <HBox alignItems="Center" class="sapUiTinyMarginBottom">
+                            <ai:AITranslateButton
+                                id="demoTranslateButton"
+                                text="Translate Text"
+                                aiModelName="ai"
+                                class="sapUiTinyMarginEnd" />
+                            <Text text="Opens a dialog to translate text into different languages using AI" />
+                        </HBox>
+                    </VBox>
+                </Panel>
+
+                <Panel headerText="AI Input Suggestion Demo" class="sapUiSmallMarginTop">
+                    <VBox class="sapUiSmallMargin">
+                        <Text text="Type some text in the field below, then click the AI button to get an improved suggestion." class="sapUiSmallMarginBottom" />
+                        <HBox alignItems="Center">
+                            <TextArea
+                                id="demoInputField"
+                                width="400px"
+                                rows="3"
+                                placeholder="Type something here..."
+                                class="sapUiTinyMarginEnd" />
+                            <ai:AIInputSuggestion
+                                id="demoInputSuggestion"
+                                target="demoInputField"
+                                aiModelName="ai" />
+                        </HBox>
+                    </VBox>
+                </Panel>
+
+                <Panel headerText="AI Sentiment Analysis Demo" class="sapUiSmallMarginTop">
+                    <VBox class="sapUiSmallMargin">
+                        <Text text="Enter text and click Analyze to detect its sentiment." class="sapUiSmallMarginBottom" />
+                        <TextArea
+                            id="sentimentInputField"
+                            width="100%"
+                            rows="3"
+                            placeholder="Enter text to analyze sentiment..."
+                            liveChange=".onSentimentTextChange"
+                            class="sapUiSmallMarginBottom" />
+                        <ai:AISentimentIndicator
+                            id="demoSentimentIndicator"
+                            aiModelName="ai"
+                            showButton="true"
+                            buttonText="Analyze Sentiment" />
                     </VBox>
                 </Panel>
             </VBox>
