@@ -12,6 +12,7 @@ import ODataModel from "sap/ui/model/odata/v4/ODataModel";
 import type { MetadataOptions } from "sap/ui/base/ManagedObject";
 import Component from "sap/ui/core/Component";
 import type Input from "sap/m/Input";
+import Element from "sap/ui/core/Element";
 
 /**
  * AIInputSuggestion - An AI assist control that attaches to an existing Input or TextArea.
@@ -112,7 +113,7 @@ export default class AIInputSuggestion extends Control {
     if (!targetId) {
       return null;
     }
-    return sap.ui.getCore().byId(targetId) as (Input | TextArea) | null;
+    return Element.getElementById(targetId) as (Input | TextArea) | null;
   }
 
   private _getTargetValue(): string {
