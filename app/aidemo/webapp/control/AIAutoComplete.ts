@@ -8,6 +8,7 @@ import type { MetadataOptions } from "sap/ui/base/ManagedObject";
 import Component from "sap/ui/core/Component";
 import type TextArea from "sap/m/TextArea";
 import type Input from "sap/m/Input";
+import Element from "sap/ui/core/Element";
 
 /**
  * AIAutoComplete - A control that attaches to an existing Input or TextArea
@@ -94,7 +95,7 @@ export default class AIAutoComplete extends Control {
     if (!targetId) {
       return null;
     }
-    return sap.ui.getCore().byId(targetId) as (Input | TextArea) | null;
+    return Element.getElementById(targetId) as (Input | TextArea) | null;
   }
 
   private _getTargetValue(): string {
