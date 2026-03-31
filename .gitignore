@@ -33,3 +33,5 @@ mta_archives/
 @cds-models
 
 dist/
+# added by cds
+.cdsrc-private.json

@@ -12,6 +12,7 @@ SAP CAP (Cloud Application Programming Model) + SAPUI5 TypeScript application th
 ```bash
 npm run watch-aidemo          # Start CDS server with live reload, opens the aidemo app
 npm run watch-hybrid          # Same but with hybrid profile (connects to real SAP AI Core service)
+npm run bind                  # Bind to AI Core instance on BTP (creates .cdsrc-private.json)
 ```
 
 ### Build & Deploy (SAP BTP Cloud Foundry)

@@ -1,0 +1,19 @@
+{
+  "requires": {
+    "[hybrid]": {
+      "AICORE": {
+        "binding": {
+          "type": "cf",
+          "apiEndpoint": "https://api.cf.<region>.hana.ondemand.com",
+          "org": "<your-cf-org>",
+          "space": "<your-cf-space>",
+          "instance": "<your-aicore-service-instance>",
+          "key": "<your-aicore-service-key>"
+        },
+        "vcap": {
+          "name": "AICORE"
+        }
+      }
+    }
+  }
+}
