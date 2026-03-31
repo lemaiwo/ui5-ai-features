@@ -21,8 +21,8 @@
   },
   "scripts": {
     "start": "cds-serve",
-    "watch-aidemo": "cds watch --open com.eliagroup.ai.aidemo/index.html?sap-ui-xx-viewCache=false --livereload false",
-    "watch-hybrid": "cds watch --profile hybrid --open com.eliagroup.ai.aidemo/index.html?sap-ui-xx-viewCache=false --livereload false",
+    "watch-aidemo": "cds watch --open be.wl.ai.aidemo/index.html?sap-ui-xx-viewCache=false --livereload false",
+    "watch-hybrid": "cds watch --profile hybrid --open be.wl.ai.aidemo/index.html?sap-ui-xx-viewCache=false --livereload false",
     "undeploy": "cf undeploy bc-aiui-features --delete-services --delete-service-keys --delete-service-brokers",
     "build": "rimraf resources mta_archives && mbt build --mtar archive",
     "deploy": "cf deploy mta_archives/archive.mtar --retries 1"

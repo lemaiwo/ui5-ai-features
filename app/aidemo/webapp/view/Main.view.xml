@@ -1,103 +1,98 @@
-<mvc:View controllerName="com.eliagroup.ai.aidemo.controller.Main"
+<mvc:View controllerName="be.wl.ai.aidemo.controller.Main"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
-    xmlns:ai="com.eliagroup.ai.aidemo.control">
+    xmlns:ai="be.wl.ai">
     <Page id="page" title="{i18n>title}">
-        <headerContent>
-            <ai:AIPolishButton
-                id="polishButton"
-                text="Polish Text"
-                dialogTitle="Polish Text with AI"
-                prompt="Polish and improve this text. Fix grammar, improve clarity, and make it more professional while keeping the original meaning."
-                aiModelName="ai" />
-            <ai:AISummarizeButton
-                id="summarizeButton"
-                text="Summarize Text"
-                dialogTitle="Summarize Text with AI"
-                prompt="Summarize the following text concisely. Capture the key points and main ideas in a clear, brief summary."
-                aiModelName="ai" />
-            <ai:AITranslateButton
-                id="translateButton"
-                text="Translate Text"
-                dialogTitle="Translate Text with AI"
-                aiModelName="ai" />
-        </headerContent>
         <content>
             <VBox class="sapUiMediumMargin">
                 <Title text="AI-Powered Text Tools" level="H2" class="sapUiSmallMarginBottom" />
-                <Text text="Use the AI controls in the header or the demos below to process text with artificial intelligence." class="sapUiSmallMarginBottom" />
+                <Text text="Enter text in the area below and use the AI tools to process it." class="sapUiSmallMarginBottom" />
 
-                <Panel headerText="Text Transformation Controls" class="sapUiSmallMarginTop">
+                <Panel headerText="AI Text Processing" class="sapUiSmallMarginTop">
                     <VBox class="sapUiSmallMargin">
-                        <HBox alignItems="Center" class="sapUiTinyMarginBottom">
+                        <TextArea
+                            id="aiSourceText"
+                            value="{/sourceText}"
+                            width="100%"
+                            rows="8"
+                            placeholder="Enter or paste the text you want to process with AI..."
+                            growing="true"
+                            growingMaxLines="15"
+                            class="sapUiSmallMarginBottom" />
+                        <OverflowToolbar>
                             <ai:AIPolishButton
                                 id="demoPolishButton"
-                                text="Polish Text"
-                                aiModelName="ai"
-                                class="sapUiTinyMarginEnd" />
-                            <Text text="Polish and improve your text — fix grammar, improve clarity, make it professional" />
-                        </HBox>
-                        <HBox alignItems="Center" class="sapUiTinyMarginBottom">
+                                text="Polish"
+                                value="{/sourceText}" />
                             <ai:AISummarizeButton
                                 id="demoSummarizeButton"
-                                text="Summarize Text"
-                                aiModelName="ai"
-                                class="sapUiTinyMarginEnd" />
-                            <Text text="Summarize long text into key points" />
-                        </HBox>
-                        <HBox alignItems="Center" class="sapUiTinyMarginBottom">
+                                text="Summarize"
+                                value="{/sourceText}" />
                             <ai:AITranslateButton
                                 id="demoTranslateButton"
-                                text="Translate Text"
-                                aiModelName="ai"
-                                class="sapUiTinyMarginEnd" />
-                            <Text text="Translate text into 12+ languages with a language selector" />
-                        </HBox>
-                        <HBox alignItems="Center" class="sapUiTinyMarginBottom">
+                                text="Translate"
+                                value="{/sourceText}" />
                             <ai:AIToneButton
                                 id="demoToneButton"
                                 text="Change Tone"
-                                aiModelName="ai"
-                                class="sapUiTinyMarginEnd" />
-                            <Text text="Rewrite text in a different tone (formal, casual, persuasive, empathetic, etc.)" />
-                        </HBox>
-                        <HBox alignItems="Center" class="sapUiTinyMarginBottom">
+                                value="{/sourceText}" />
+                            <ToolbarSpacer />
                             <ai:AIGenerateButton
                                 id="demoGenerateButton"
-                                text="Generate Text"
-                                aiModelName="ai"
-                                class="sapUiTinyMarginEnd" />
-                            <Text text="Generate text from a brief description or instructions" />
-                        </HBox>
+                                text="Generate"
+                                value="{/sourceText}" />
+                        </OverflowToolbar>
                     </VBox>
                 </Panel>
 
                 <Panel headerText="Validation &amp; Analysis Controls" class="sapUiSmallMarginTop">
                     <VBox class="sapUiSmallMargin">
-                        <HBox alignItems="Center" class="sapUiTinyMarginBottom">
+                        <OverflowToolbar>
                             <ai:AISpellCheckButton
                                 id="demoSpellCheckButton"
                                 text="Spell Check"
-                                aiModelName="ai"
-                                class="sapUiTinyMarginEnd" />
-                            <Text text="Check spelling and grammar — preserves your style, only fixes errors, shows corrections list" />
-                        </HBox>
-                        <HBox alignItems="Center" class="sapUiTinyMarginBottom">
+                                value="{/sourceText}" />
                             <ai:AIExtractKeywordsButton
                                 id="demoKeywordsButton"
                                 text="Extract Keywords"
-                                aiModelName="ai"
-                                class="sapUiTinyMarginEnd" />
-                            <Text text="Extract keywords and tags from text, displayed as tokens" />
+                                value="{/sourceText}" />
+                        </OverflowToolbar>
+                    </VBox>
+                </Panel>
+
+                <Panel headerText="Compare Texts" class="sapUiSmallMarginTop">
+                    <VBox class="sapUiSmallMargin">
+                        <HBox width="100%">
+                            <VBox width="50%" class="sapUiTinyMarginEnd">
+                                <Label text="Text 1" labelFor="compareText1" />
+                                <TextArea
+                                    id="compareText1"
+                                    value="{/compareText1}"
+                                    width="100%"
+                                    rows="6"
+                                    placeholder="Enter the first text..."
+                                    growing="true"
+                                    growingMaxLines="10" />
+                            </VBox>
+                            <VBox width="50%">
+                                <Label text="Text 2" labelFor="compareText2" />
+                                <TextArea
+                                    id="compareText2"
+                                    value="{/compareText2}"
+                                    width="100%"
+                                    rows="6"
+                                    placeholder="Enter the second text..."
+                                    growing="true"
+                                    growingMaxLines="10" />
+                            </VBox>
                         </HBox>
-                        <HBox alignItems="Center" class="sapUiTinyMarginBottom">
+                        <OverflowToolbar class="sapUiSmallMarginTop">
                             <ai:AICompareTexts
                                 id="demoCompareButton"
                                 text="Compare Texts"
-                                aiModelName="ai"
-                                class="sapUiTinyMarginEnd" />
-                            <Text text="Compare two texts side-by-side with AI-powered difference analysis" />
-                        </HBox>
+                                value1="{/compareText1}"
+                                value2="{/compareText2}" />
+                        </OverflowToolbar>
                     </VBox>
                 </Panel>
 
@@ -107,14 +102,14 @@
                         <HBox alignItems="Center">
                             <TextArea
                                 id="demoInputField"
+                                value="{/suggestionText}"
                                 width="400px"
                                 rows="3"
                                 placeholder="Type something here..."
                                 class="sapUiTinyMarginEnd" />
                             <ai:AIInputSuggestion
                                 id="demoInputSuggestion"
-                                target="demoInputField"
-                                aiModelName="ai" />
+                                value="{/suggestionText}" />
                         </HBox>
                     </VBox>
                 </Panel>
@@ -125,14 +120,14 @@
                         <HBox alignItems="Center">
                             <TextArea
                                 id="demoAutoCompleteField"
+                                value="{/autoCompleteText}"
                                 width="400px"
                                 rows="3"
                                 placeholder="Start typing a sentence..."
                                 class="sapUiTinyMarginEnd" />
                             <ai:AIAutoComplete
                                 id="demoAutoComplete"
-                                target="demoAutoCompleteField"
-                                aiModelName="ai" />
+                                value="{/autoCompleteText}" />
                         </HBox>
                     </VBox>
                 </Panel>
@@ -142,14 +137,14 @@
                         <Text text="Enter text and click Analyze to detect its sentiment." class="sapUiSmallMarginBottom" />
                         <TextArea
                             id="sentimentInputField"
+                            value="{/sentimentText}"
                             width="100%"
                             rows="3"
                             placeholder="Enter text to analyze sentiment..."
-                            liveChange=".onSentimentTextChange"
                             class="sapUiSmallMarginBottom" />
                         <ai:AISentimentIndicator
                             id="demoSentimentIndicator"
-                            aiModelName="ai"
+                            text="{/sentimentText}"
                             showButton="true"
                             buttonText="Analyze Sentiment" />
                     </VBox>

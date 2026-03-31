@@ -4,9 +4,8 @@ import Button from "sap/m/Button";
 import ObjectStatus from "sap/m/ObjectStatus";
 import HBox from "sap/m/HBox";
 import MessageToast from "sap/m/MessageToast";
-import ODataModel from "sap/ui/model/odata/v4/ODataModel";
+import { getAIModel } from "./AIModel";
 import type { MetadataOptions } from "sap/ui/base/ManagedObject";
-import Component from "sap/ui/core/Component";
 import { ValueState } from "sap/ui/core/library";
 
 type SentimentValue = "positive" | "neutral" | "negative" | "none";
@@ -15,7 +14,7 @@ type SentimentValue = "positive" | "neutral" | "negative" | "none";
  * AISentimentIndicator - Analyzes text sentiment using AI and displays a visual indicator.
  * Shows a colored status (positive/neutral/negative) based on AI analysis.
  *
- * @namespace com.eliagroup.ai.aidemo.control
+ * @namespace be.wl.ai
  */
 export default class AISentimentIndicator extends Control {
   static readonly metadata: MetadataOptions = {
@@ -27,13 +26,6 @@ export default class AISentimentIndicator extends Control {
         type: "string",
         defaultValue:
           "Analyze the sentiment of the following text. Respond with ONLY one word: positive, neutral, or negative. Nothing else."
-      },
-      /**
-       * The name of the OData model to use for the AI service
-       */
-      aiModelName: {
-        type: "string",
-        defaultValue: "ai"
       },
       /**
        * The text to analyze. Can be bound to a model property.
@@ -77,10 +69,15 @@ export default class AISentimentIndicator extends Control {
     }
   };
 
-  private _button: Button | null = null;
-  private _status: ObjectStatus | null = null;
-  private _container: HBox | null = null;
-  private _busy: boolean = false;
+  private _button: Button | null;
+  private _status: ObjectStatus | null;
+  private _container: HBox | null;
+  private _busy: boolean;
+
+  init(): void {
+    super.init();
+    
+  }
 
   static readonly renderer = {
     apiVersion: 2,
@@ -199,22 +196,13 @@ export default class AISentimentIndicator extends Control {
       return this.getProperty("sentiment") as SentimentValue;
     }
 
-    const aiModelName = this.getProperty("aiModelName") as string;
-    const ownerComponent = Component.getOwnerComponentFor(this);
-    const model = (ownerComponent?.getModel(aiModelName) || this.getModel(aiModelName)) as ODataModel;
-
-    if (!model) {
-      MessageToast.show(`AI model '${aiModelName}' not found`);
-      return "none";
-    }
-
     try {
       this._busy = true;
       if (this._button) {
         this._button.setBusy(true);
       }
 
-      const context = model.bindContext("/processText(...)");
+      const context = getAIModel().bindContext("/processText(...)");
       context.setParameter("prompt", this.getProperty("prompt") as string);
       context.setParameter("text", textToAnalyze);
 
@@ -265,7 +253,6 @@ export default class AISentimentIndicator extends Control {
 
 interface $AISentimentIndicatorSettings {
   prompt?: string;
-  aiModelName?: string;
   text?: string;
   sentiment?: string;
   showButton?: boolean;

@@ -1,7 +1,7 @@
 import Controller from "sap/ui/core/mvc/Controller";
 
 /**
- * @namespace com.eliagroup.ai.aidemo.controller
+ * @namespace be.wl.ai.aidemo.controller
  */
 export default class App extends Controller {
 

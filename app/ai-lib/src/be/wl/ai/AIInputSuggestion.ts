@@ -7,19 +7,15 @@ import HBox from "sap/m/HBox";
 import TextArea from "sap/m/TextArea";
 import Text from "sap/m/Text";
 import MessageToast from "sap/m/MessageToast";
-import BusyIndicator from "sap/ui/core/BusyIndicator";
-import ODataModel from "sap/ui/model/odata/v4/ODataModel";
+import { getAIModel } from "./AIModel";
 import type { MetadataOptions } from "sap/ui/base/ManagedObject";
-import Component from "sap/ui/core/Component";
-import type Input from "sap/m/Input";
-import Element from "sap/ui/core/Element";
 
 /**
  * AIInputSuggestion - An AI assist control that attaches to an existing Input or TextArea.
  * Renders a small AI button next to the target control. Clicking it opens a popover
  * with AI-generated suggestion based on the current field value.
  *
- * @namespace com.eliagroup.ai.aidemo.control
+ * @namespace be.wl.ai
  */
 export default class AIInputSuggestion extends Control {
   static readonly metadata: MetadataOptions = {
@@ -34,13 +30,6 @@ export default class AIInputSuggestion extends Control {
           "Improve and complete the following text. Make it more professional and clear. Only return the improved text, no explanations:\n\n{text}"
       },
       /**
-       * The name of the OData model to use for the AI service
-       */
-      aiModelName: {
-        type: "string",
-        defaultValue: "ai"
-      },
-      /**
        * Button tooltip
        */
       buttonTooltip: {
@@ -53,15 +42,10 @@ export default class AIInputSuggestion extends Control {
       popoverTitle: {
         type: "string",
         defaultValue: "AI Suggestion"
-      }
-    },
-    associations: {
-      /**
-       * The target input control (sap.m.Input or sap.m.TextArea) to attach to
-       */
-      target: {
-        type: "sap.ui.core.Control",
-        multiple: false
+      },
+      value: {
+        type: "string",
+        defaultValue: ""
       }
     },
     events: {
@@ -77,10 +61,15 @@ export default class AIInputSuggestion extends Control {
     }
   };
 
-  private _button: Button | null = null;
-  private _popover: ResponsivePopover | null = null;
-  private _suggestionTextArea: TextArea | null = null;
-  private _originalText: string = "";
+  private _button: Button | null;
+  private _popover: ResponsivePopover | null;
+  private _suggestionTextArea: TextArea | null;
+  private _originalText: string;
+
+  init(): void {
+    super.init();
+    
+  }
 
   static readonly renderer = {
     apiVersion: 2,
@@ -108,33 +97,8 @@ export default class AIInputSuggestion extends Control {
     return this._button;
   }
 
-  private _getTargetControl(): (Input | TextArea) | null {
-    const targetId = this.getAssociation("target") as string;
-    if (!targetId) {
-      return null;
-    }
-    return Element.getElementById(targetId) as (Input | TextArea) | null;
-  }
-
-  private _getTargetValue(): string {
-    const target = this._getTargetControl();
-    if (!target) {
-      return "";
-    }
-    // Both Input and TextArea have getValue()
-    return (target as TextArea).getValue() || "";
-  }
-
-  private _setTargetValue(value: string): void {
-    const target = this._getTargetControl();
-    if (!target) {
-      return;
-    }
-    (target as TextArea).setValue(value);
-  }
-
   private _onButtonPress(): void {
-    const text = this._getTargetValue();
+    const text = this.getProperty("value") as string;
     if (!text || text.trim() === "") {
       MessageToast.show("Please enter some text in the field first");
       return;
@@ -198,23 +162,14 @@ export default class AIInputSuggestion extends Control {
 
   private async _fetchSuggestion(text: string): Promise<void> {
     this._originalText = text;
-    const aiModelName = this.getProperty("aiModelName") as string;
-
-    const ownerComponent = Component.getOwnerComponentFor(this);
-    const model = (ownerComponent?.getModel(aiModelName) || this.getModel(aiModelName)) as ODataModel;
-
-    if (!model) {
-      MessageToast.show(`AI model '${aiModelName}' not found`);
-      return;
-    }
 
     try {
-      BusyIndicator.show(0);
+      this._popover?.setBusy(true);
 
       const promptTemplate = this.getProperty("prompt") as string;
       const prompt = promptTemplate.replace("{text}", text);
 
-      const context = model.bindContext("/processText(...)");
+      const context = getAIModel().bindContext("/processText(...)");
       context.setParameter("prompt", prompt);
       context.setParameter("text", text);
 
@@ -229,14 +184,14 @@ export default class AIInputSuggestion extends Control {
       MessageToast.show("Failed to get AI suggestion. Please try again.");
       this._popover?.close();
     } finally {
-      BusyIndicator.hide();
+      this._popover?.setBusy(false);
     }
   }
 
   private _onAccept(): void {
     const suggestedText = this._suggestionTextArea?.getValue() || "";
     if (suggestedText) {
-      this._setTargetValue(suggestedText);
+      this.setProperty("value", suggestedText);
       this.fireEvent("suggestionAccepted", {
         originalText: this._originalText,
         suggestedText: suggestedText
@@ -261,10 +216,9 @@ export default class AIInputSuggestion extends Control {
 
 interface $AIInputSuggestionSettings {
   prompt?: string;
-  aiModelName?: string;
   buttonTooltip?: string;
   popoverTitle?: string;
-  target?: string;
+  value?: string;
   suggestionAccepted?: (event: AIInputSuggestion$SuggestionAcceptedEvent) => void;
 }
 

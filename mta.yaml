@@ -54,10 +54,24 @@ modules:
     build-result: app/
     requires:
     - artifacts:
-      - comeliagroupaiaidemo.zip
-      name: comeliagroupaiaidemo
+      - bewlai.zip
+      name: bewlai
       target-path: app/
-- name: comeliagroupaiaidemo
+    - artifacts:
+      - bewlaiaidemo.zip
+      name: bewlaiaidemo
+      target-path: app/
+- name: bewlai
+  type: html5
+  path: app/ai-lib
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: bewlaiaidemo
   type: html5
   path: app/aidemo
   build-parameters:

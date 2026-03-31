@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-SAP CAP (Cloud Application Programming Model) + SAPUI5 TypeScript application that provides AI-powered text processing features via SAP AI Core's Orchestration Service. The app namespace is `com.eliagroup.ai.aidemo`.
+SAP CAP (Cloud Application Programming Model) + SAPUI5 TypeScript application that provides AI-powered text processing features via SAP AI Core's Orchestration Service. The app namespace is `be.wl.ai.aidemo`.
 
 ## Commands
 

@@ -3,19 +3,15 @@ import type RenderManager from "sap/ui/core/RenderManager";
 import Button from "sap/m/Button";
 import MessageToast from "sap/m/MessageToast";
 import BusyIndicator from "sap/ui/core/BusyIndicator";
-import ODataModel from "sap/ui/model/odata/v4/ODataModel";
+import { getAIModel } from "./AIModel";
 import type { MetadataOptions } from "sap/ui/base/ManagedObject";
-import Component from "sap/ui/core/Component";
-import type TextArea from "sap/m/TextArea";
-import type Input from "sap/m/Input";
-import Element from "sap/ui/core/Element";
 
 /**
  * AIAutoComplete - A control that attaches to an existing Input or TextArea
  * and provides an AI-powered text completion button. The user writes partial text
  * and clicks the button to have AI complete it.
  *
- * @namespace com.eliagroup.ai.aidemo.control
+ * @namespace be.wl.ai
  */
 export default class AIAutoComplete extends Control {
   static readonly metadata: MetadataOptions = {
@@ -28,25 +24,16 @@ export default class AIAutoComplete extends Control {
         defaultValue:
           "Continue and complete the following text naturally. Maintain the same style and tone. Only return the completed text (including the original beginning), no explanations:\n\n{text}"
       },
-      aiModelName: {
-        type: "string",
-        defaultValue: "ai"
-      },
       /**
        * Tooltip for the complete button
        */
       buttonTooltip: {
         type: "string",
         defaultValue: "Complete text with AI"
-      }
-    },
-    associations: {
-      /**
-       * The target input control (sap.m.Input or sap.m.TextArea) to complete text in
-       */
-      target: {
-        type: "sap.ui.core.Control",
-        multiple: false
+      },
+      value: {
+        type: "string",
+        defaultValue: ""
       }
     },
     events: {
@@ -62,7 +49,12 @@ export default class AIAutoComplete extends Control {
     }
   };
 
-  private _button: Button | null = null;
+  private _button: Button | null;
+
+  init(): void {
+    super.init();
+    
+  }
 
   static readonly renderer = {
     apiVersion: 2,
@@ -90,44 +82,10 @@ export default class AIAutoComplete extends Control {
     return this._button;
   }
 
-  private _getTargetControl(): (Input | TextArea) | null {
-    const targetId = this.getAssociation("target") as string;
-    if (!targetId) {
-      return null;
-    }
-    return Element.getElementById(targetId) as (Input | TextArea) | null;
-  }
-
-  private _getTargetValue(): string {
-    const target = this._getTargetControl();
-    if (!target) {
-      return "";
-    }
-    return (target as TextArea).getValue() || "";
-  }
-
-  private _setTargetValue(value: string): void {
-    const target = this._getTargetControl();
-    if (!target) {
-      return;
-    }
-    (target as TextArea).setValue(value);
-  }
-
   private async _onCompletePress(): Promise<void> {
-    const text = this._getTargetValue();
+    const text = this.getProperty("value") as string;
     if (!text || text.trim() === "") {
       MessageToast.show("Please enter some text to complete");
-      return;
-    }
-
-    const aiModelName = this.getProperty("aiModelName") as string;
-
-    const ownerComponent = Component.getOwnerComponentFor(this);
-    const model = (ownerComponent?.getModel(aiModelName) || this.getModel(aiModelName)) as ODataModel;
-
-    if (!model) {
-      MessageToast.show(`AI model '${aiModelName}' not found`);
       return;
     }
 
@@ -137,7 +95,7 @@ export default class AIAutoComplete extends Control {
       const promptTemplate = this.getProperty("prompt") as string;
       const prompt = promptTemplate.replace("{text}", text);
 
-      const context = model.bindContext("/processText(...)");
+      const context = getAIModel().bindContext("/processText(...)");
       context.setParameter("prompt", prompt);
       context.setParameter("text", text);
 
@@ -146,7 +104,7 @@ export default class AIAutoComplete extends Control {
       const result = context.getBoundContext().getObject() as { value: string } | undefined;
       const completedText = result?.value || "";
 
-      this._setTargetValue(completedText);
+      this.setProperty("value", completedText);
 
       this.fireEvent("textCompleted", {
         originalText: text,
@@ -172,9 +130,8 @@ export default class AIAutoComplete extends Control {
 
 interface $AIAutoCompleteSettings {
   prompt?: string;
-  aiModelName?: string;
   buttonTooltip?: string;
-  target?: string;
+  value?: string;
   textCompleted?: (event: AIAutoComplete$TextCompletedEvent) => void;
 }
 

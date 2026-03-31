@@ -2,8 +2,14 @@
 
 specVersion: "4.0"
 metadata:
-  name: be.wl.ai.aidemo
-type: application
+  name: be.wl.ai
+type: library
+framework:
+  name: SAPUI5
+  version: "1.144.0"
+  libraries:
+    - name: sap.m
+    - name: sap.ui.core
 builder:
   customTasks:
     - name: ui5-tooling-transpile-task
@@ -13,16 +19,7 @@ builder:
         transformModulesToUI5:
           overridesToOverride: true
     - name: ui5-task-zipper
-      afterTask: generateCachebusterInfo
+      afterTask: generateResourcesJson
       configuration:
-        archiveName: bewlaiaidemo
+        archiveName: bewlai
         relativePaths: true
-        additionalFiles:
-          - xs-app.json
-  resources:
-    excludes:
-      - /test/**
-      - /localService/**
-resources:
-  configuration:
-    propertiesFileSourceEncoding: UTF-8

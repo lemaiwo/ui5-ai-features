@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<library xmlns="http://www.sap.com/sap.ui.library.xsd">
+  <name>be.wl.ai</name>
+  <vendor>WL</vendor>
+  <version>${version}</version>
+  <dependencies>
+    <dependency>
+      <libraryName>sap.ui.core</libraryName>
+    </dependency>
+    <dependency>
+      <libraryName>sap.m</libraryName>
+    </dependency>
+  </dependencies>
+</library>

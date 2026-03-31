@@ -8,7 +8,7 @@
     "appName": "aidemo",
     "appTitle": "App Title",
     "appDescription": "An SAP Fiori application.",
-    "appNamespace": "com.eliagroup.ai",
+    "appNamespace": "be.wl.ai",
     "ui5Theme": "sap_horizon",
     "ui5Version": "1.144.0",
     "enableEslint": false,
@@ -18,6 +18,6 @@
     "template": "Basic V4",
     "generatorName": "SAP Fiori Application Generator",
     "entityRelatedConfig": [],
-    "launchText": "To launch the generated app, start your CAP project:  and navigate to the following location in your browser:\n\nhttp://localhost:4004/com.eliagroup.ai.aidemo/index.html"
+    "launchText": "To launch the generated app, start your CAP project:  and navigate to the following location in your browser:\n\nhttp://localhost:4004/be.wl.ai.aidemo/index.html"
   }
 }

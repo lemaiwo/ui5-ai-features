@@ -10,7 +10,7 @@
 |**Service URL**<br>http://localhost:4004/odata/v4/catalog/|
 |**Module Name**<br>aidemo|
 |**Application Title**<br>App Title|
-|**Namespace**<br>com.eliagroup.ai|
+|**Namespace**<br>be.wl.ai|
 |**UI5 Theme**<br>sap_horizon|
 |**UI5 Version**<br>1.144.0|
 |**Enable TypeScript**<br>True|
@@ -24,7 +24,7 @@ An SAP Fiori application.
 
 -   This app has been generated using the SAP Fiori tools - App Generator, as part of the SAP Fiori tools suite.  To launch the generated app, start your CAP project:  and navigate to the following location in your browser:
 
-http://localhost:4004/com.eliagroup.ai.aidemo/index.html
+http://localhost:4004/be.wl.ai.aidemo/index.html
 
 #### Pre-requisites:
 

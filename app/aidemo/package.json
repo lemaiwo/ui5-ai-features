@@ -8,7 +8,9 @@
     "sapui5"
   ],
   "main": "webapp/index.html",
-  "dependencies": {},
+  "dependencies": {
+    "be.wl.ai": "*"
+  },
   "devDependencies": {
     "@ui5/cli": "^4.0.33",
     "@sap/ux-ui5-tooling": "1",

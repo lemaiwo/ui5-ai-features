@@ -7,14 +7,12 @@
     "strict": true,
     "strictPropertyInitialization": false,
     "moduleResolution": "node",
+    "rootDir": "./src",
     "outDir": "./dist",
     "baseUrl": "./",
     "paths": {
-      "be/wl/ai/aidemo/*": [
-        "./webapp/*"
-      ],
       "be/wl/ai/*": [
-        "../ai-lib/src/be/wl/ai/*"
+        "./src/be/wl/ai/*"
       ]
     },
     "typeRoots": [
@@ -25,6 +23,6 @@
     ]
   },
   "include": [
-    "./webapp/**/*"
+    "./src/**/*"
   ]
 }

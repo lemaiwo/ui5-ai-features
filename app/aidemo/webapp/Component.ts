@@ -2,7 +2,7 @@ import BaseComponent from "sap/ui/core/UIComponent";
 import { createDeviceModel } from "./model/models";
 
 /**
- * @namespace com.eliagroup.ai.aidemo
+ * @namespace be.wl.ai.aidemo
  */
 export default class Component extends BaseComponent {
 
