@@ -9,6 +9,7 @@ import BusyIndicator from "sap/ui/core/BusyIndicator";
 import FormattedText from "sap/m/FormattedText";
 import Control from "sap/ui/core/Control";
 import type { MetadataOptions } from "sap/ui/base/ManagedObject";
+import { callAIService } from "./AIModel";
 
 /**
  * AISpellCheckButton - A button that checks spelling and grammar using AI.
@@ -22,16 +23,6 @@ export default class AISpellCheckButton extends AIBaseButton {
 
   static readonly metadata: MetadataOptions = {
     properties: {
-      prompt: {
-        type: "string",
-        defaultValue:
-          "Check the following text for spelling and grammar errors. Fix only the errors while preserving the author's original style, tone, and word choices. Do not rephrase or improve — only correct mistakes. Return only the corrected text."
-      },
-      summaryPrompt: {
-        type: "string",
-        defaultValue:
-          "Compare the original text and the corrected text below. List each correction made as a short bullet point in HTML format using <ul><li> tags. If no corrections were needed, say 'No corrections needed.'\n\nOriginal:\n{original}\n\nCorrected:\n{corrected}"
-      },
       dialogTitle: {
         type: "string",
         defaultValue: "Spell & Grammar Check with AI"
@@ -60,6 +51,10 @@ export default class AISpellCheckButton extends AIBaseButton {
     super(idOrSettings as string, settings);
   }
 
+  protected getOperation(): string {
+    return "spellcheck";
+  }
+
   protected getDefaultIcon(): string {
     return "sap-icon://spell-checker";
   }
@@ -81,18 +76,12 @@ export default class AISpellCheckButton extends AIBaseButton {
       BusyIndicator.show(0);
 
       // Step 1: Get corrected text
-      this.resultText = await this.callAI(
-        this.getProperty("prompt") as string,
-        inputText
-      );
+      this.resultText = await this.callAI(inputText);
 
       // Step 2: Get corrections summary
-      const summaryPromptTemplate = this.getProperty("summaryPrompt") as string;
-      const summaryPrompt = summaryPromptTemplate
-        .replace("{original}", inputText)
-        .replace("{corrected}", this.resultText);
-
-      let corrections = await this.callAI(summaryPrompt, inputText);
+      let corrections = await callAIService("spellcheckSummary", inputText, {
+        text2: this.resultText
+      });
       corrections = corrections.replace(/^```html\s*\n?/i, "").replace(/\n?```\s*$/i, "");
       this.correctionsHtml = corrections;
 
@@ -149,8 +138,6 @@ export default class AISpellCheckButton extends AIBaseButton {
 }
 
 interface $AISpellCheckButtonSettings extends $AIBaseButtonSettings {
-  prompt?: string;
-  summaryPrompt?: string;
   dialogTitle?: string;
   outputLabel?: string;
   value?: string;

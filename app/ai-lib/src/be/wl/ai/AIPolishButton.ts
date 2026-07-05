@@ -15,11 +15,6 @@ export default class AIPolishButton extends AIBaseButton {
 
   static readonly metadata: MetadataOptions = {
     properties: {
-      prompt: {
-        type: "string",
-        defaultValue:
-          "Polish and improve this text. Fix grammar, improve clarity, and make it more professional while keeping the original meaning."
-      },
       dialogTitle: {
         type: "string",
         defaultValue: "Polish Text with AI"
@@ -44,6 +39,10 @@ export default class AIPolishButton extends AIBaseButton {
     super(idOrSettings as string, settings);
   }
 
+  protected getOperation(): string {
+    return "polish";
+  }
+
   protected getEmptyInputMessage(): string {
     return "Please enter some text to polish";
   }
@@ -61,7 +60,6 @@ export default class AIPolishButton extends AIBaseButton {
 }
 
 interface $AIPolishButtonSettings extends $AIBaseButtonSettings {
-  prompt?: string;
   dialogTitle?: string;
   outputLabel?: string;
   value?: string;

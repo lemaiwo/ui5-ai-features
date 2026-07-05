@@ -7,7 +7,7 @@ import HBox from "sap/m/HBox";
 import TextArea from "sap/m/TextArea";
 import Text from "sap/m/Text";
 import MessageToast from "sap/m/MessageToast";
-import { getAIModel } from "./AIModel";
+import { callAIService } from "./AIModel";
 import type { MetadataOptions } from "sap/ui/base/ManagedObject";
 
 /**
@@ -20,15 +20,6 @@ import type { MetadataOptions } from "sap/ui/base/ManagedObject";
 export default class AIInputSuggestion extends Control {
   static readonly metadata: MetadataOptions = {
     properties: {
-      /**
-       * The prompt instruction sent to the AI service.
-       * Use {text} as placeholder for the current field value.
-       */
-      prompt: {
-        type: "string",
-        defaultValue:
-          "Improve and complete the following text. Make it more professional and clear. Only return the improved text, no explanations:\n\n{text}"
-      },
       /**
        * Button tooltip
        */
@@ -166,17 +157,7 @@ export default class AIInputSuggestion extends Control {
     try {
       this._popover?.setBusy(true);
 
-      const promptTemplate = this.getProperty("prompt") as string;
-      const prompt = promptTemplate.replace("{text}", text);
-
-      const context = getAIModel().bindContext("/processText(...)");
-      context.setParameter("prompt", prompt);
-      context.setParameter("text", text);
-
-      await context.invoke();
-
-      const result = context.getBoundContext().getObject() as { value: string } | undefined;
-      const suggestion = result?.value || "";
+      const suggestion = await callAIService("suggest", text);
 
       this._suggestionTextArea?.setValue(suggestion);
     } catch (error) {
@@ -215,7 +196,6 @@ export default class AIInputSuggestion extends Control {
 }
 
 interface $AIInputSuggestionSettings {
-  prompt?: string;
   buttonTooltip?: string;
   popoverTitle?: string;
   value?: string;

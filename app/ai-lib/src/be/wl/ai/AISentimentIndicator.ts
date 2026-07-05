@@ -4,7 +4,7 @@ import Button from "sap/m/Button";
 import ObjectStatus from "sap/m/ObjectStatus";
 import HBox from "sap/m/HBox";
 import MessageToast from "sap/m/MessageToast";
-import { getAIModel } from "./AIModel";
+import { callAIService } from "./AIModel";
 import type { MetadataOptions } from "sap/ui/base/ManagedObject";
 import { ValueState } from "sap/ui/core/library";
 
@@ -19,14 +19,6 @@ type SentimentValue = "positive" | "neutral" | "negative" | "none";
 export default class AISentimentIndicator extends Control {
   static readonly metadata: MetadataOptions = {
     properties: {
-      /**
-       * The prompt instruction sent to the AI service for sentiment analysis
-       */
-      prompt: {
-        type: "string",
-        defaultValue:
-          "Analyze the sentiment of the following text. Respond with ONLY one word: positive, neutral, or negative. Nothing else."
-      },
       /**
        * The text to analyze. Can be bound to a model property.
        */
@@ -202,14 +194,8 @@ export default class AISentimentIndicator extends Control {
         this._button.setBusy(true);
       }
 
-      const context = getAIModel().bindContext("/processText(...)");
-      context.setParameter("prompt", this.getProperty("prompt") as string);
-      context.setParameter("text", textToAnalyze);
-
-      await context.invoke();
-
-      const result = context.getBoundContext().getObject() as { value: string } | undefined;
-      const rawSentiment = (result?.value || "").trim().toLowerCase();
+      const rawResult = await callAIService("sentiment", textToAnalyze);
+      const rawSentiment = rawResult.trim().toLowerCase();
 
       let sentiment: SentimentValue = "neutral";
       if (rawSentiment.includes("positive")) {
@@ -252,7 +238,6 @@ export default class AISentimentIndicator extends Control {
 }
 
 interface $AISentimentIndicatorSettings {
-  prompt?: string;
   text?: string;
   sentiment?: string;
   showButton?: boolean;

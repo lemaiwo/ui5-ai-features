@@ -39,7 +39,7 @@ cd app/aidemo && npx eslint . # UI5 app has its own ESLint config (@sap-ux/eslin
 
 - **`db/schema.cds`** - Domain model (Books entity in `my.bookshop` namespace)
 - **`srv/cat-service.cds`** - CatalogService exposing Books as read-only projection
-- **`srv/ai-service.cds`** - AIService with `processText(prompt, text)` action
+- **`srv/ai-service.cds`** - AIService with `processText(operation, text, text2, option)` action. Prompts are maintained server-side in a registry in `srv/ai-service.js` — clients send an operation key (e.g. `polish`, `translate`) plus an allowlisted `option` (language/tone key) where applicable. The handler enforces input length limits and per-user rate limiting, and returns generic error messages.
 - **`srv/ai-service.js`** - Implementation using `@sap-ai-sdk/orchestration` `OrchestrationClient` to call GPT-4o via SAP AI Core
 
 The CAP server exposes two OData V4 services: `/odata/v4/catalog/` and `/odata/v4/ai/`.
@@ -48,8 +48,8 @@ The CAP server exposes two OData V4 services: `/odata/v4/catalog/` and `/odata/v
 
 Written in TypeScript, transpiled via `ui5-tooling-transpile`. Uses SAPUI5 1.144.x with `@sapui5/types`.
 
-Key custom control:
-- **`control/AIPolishButton.ts`** - Reusable UI5 custom control extending `sap/m/Button`. Opens a dialog for AI text polishing. Configurable via properties: `prompt`, `aiModelName`, `dialogTitle`, `inputPlaceholder`, `inputLabel`, `outputLabel`. Calls the AI service via OData V4 action binding (`model.bindContext("/processText(...)")`).
+Key custom controls:
+- **`app/ai-lib/src/be/wl/ai/`** - Reusable UI5 custom controls (e.g. `AIPolishButton` extending `sap/m/Button` via `AIBaseButton`). Each control invokes a fixed server-side operation key (see `getOperation()`) through the shared `callAIService` helper in `AIModel.ts` — prompts are not configurable from the client. Configurable properties are limited to UI texts (`dialogTitle`, `outputLabel`, …) and bindable values.
 
 The app uses two OData models: default (`""`) for CatalogService and `"ai"` for AIService.
 

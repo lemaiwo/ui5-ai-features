@@ -10,7 +10,7 @@ import VBox from "sap/m/VBox";
 import Label from "sap/m/Label";
 import MessageToast from "sap/m/MessageToast";
 import BusyIndicator from "sap/ui/core/BusyIndicator";
-import { getAIModel } from "./AIModel";
+import { callAIService } from "./AIModel";
 import type { MetadataOptions } from "sap/ui/base/ManagedObject";
 import type { Menu$ItemSelectedEvent } from "sap/m/Menu";
 
@@ -46,11 +46,6 @@ export default class AITranslateButton extends MenuButton {
 
   static readonly metadata: MetadataOptions = {
     properties: {
-      prompt: {
-        type: "string",
-        defaultValue:
-          "Translate the following text to {targetLanguage}. Preserve the original meaning, tone, and formatting. Only return the translated text, no explanations."
-      },
       dialogTitle: {
         type: "string",
         defaultValue: "Translate Text with AI"
@@ -109,11 +104,11 @@ export default class AITranslateButton extends MenuButton {
     if (!languagesProp) {
       return DEFAULT_LANGUAGES;
     }
+    // Only languages known to the backend allowlist are supported
     const codes = languagesProp.split(",").map((s: string) => s.trim());
-    return codes.map((code: string) => {
-      const found = DEFAULT_LANGUAGES.find((l) => l.key === code);
-      return found || { key: code, text: code.toUpperCase() };
-    });
+    return codes
+      .map((code: string) => DEFAULT_LANGUAGES.find((l) => l.key === code))
+      .filter((l): l is LanguageEntry => l !== undefined);
   }
 
   private _setupMenu(): void {
@@ -146,17 +141,9 @@ export default class AITranslateButton extends MenuButton {
     try {
       BusyIndicator.show(0);
 
-      const promptTemplate = this.getProperty("prompt") as string;
-      const prompt = promptTemplate.replace("{targetLanguage}", lang.text);
-
-      const context = getAIModel().bindContext("/processText(...)");
-      context.setParameter("prompt", prompt);
-      context.setParameter("text", inputText);
-
-      await context.invoke();
-
-      const result = context.getBoundContext().getObject() as { value: string } | undefined;
-      this._resultText = result?.value || "";
+      this._resultText = await callAIService("translate", inputText, {
+        option: lang.key
+      });
 
       this._showResultDialog(lang.text);
     } catch (error) {
@@ -240,7 +227,6 @@ export default class AITranslateButton extends MenuButton {
 }
 
 interface $AITranslateButtonSettings extends $MenuButtonSettings {
-  prompt?: string;
   dialogTitle?: string;
   outputLabel?: string;
   languages?: string;

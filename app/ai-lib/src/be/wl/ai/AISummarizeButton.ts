@@ -17,11 +17,6 @@ export default class AISummarizeButton extends AIBaseButton {
 
   static readonly metadata: MetadataOptions = {
     properties: {
-      prompt: {
-        type: "string",
-        defaultValue:
-          "Summarize the following text concisely. Capture the key points and main ideas in a clear, brief summary."
-      },
       dialogTitle: {
         type: "string",
         defaultValue: "Summarize Text with AI"
@@ -46,6 +41,10 @@ export default class AISummarizeButton extends AIBaseButton {
     super(idOrSettings as string, settings);
   }
 
+  protected getOperation(): string {
+    return "summarize";
+  }
+
   protected hasAcceptReject(): boolean {
     return false;
   }
@@ -61,10 +60,7 @@ export default class AISummarizeButton extends AIBaseButton {
   protected async processText(inputText: string): Promise<void> {
     try {
       BusyIndicator.show(0);
-      this.resultText = await this.callAI(
-        this.getProperty("prompt") as string,
-        inputText
-      );
+      this.resultText = await this.callAI(inputText);
       this.fireResultEvent();
       this.showResultDialog();
     } catch (error) {
@@ -84,7 +80,6 @@ export default class AISummarizeButton extends AIBaseButton {
 }
 
 interface $AISummarizeButtonSettings extends $AIBaseButtonSettings {
-  prompt?: string;
   dialogTitle?: string;
   outputLabel?: string;
   value?: string;

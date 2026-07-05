@@ -3,7 +3,7 @@ import type RenderManager from "sap/ui/core/RenderManager";
 import Button from "sap/m/Button";
 import MessageToast from "sap/m/MessageToast";
 import BusyIndicator from "sap/ui/core/BusyIndicator";
-import { getAIModel } from "./AIModel";
+import { callAIService } from "./AIModel";
 import type { MetadataOptions } from "sap/ui/base/ManagedObject";
 
 /**
@@ -16,14 +16,6 @@ import type { MetadataOptions } from "sap/ui/base/ManagedObject";
 export default class AIAutoComplete extends Control {
   static readonly metadata: MetadataOptions = {
     properties: {
-      /**
-       * The prompt instruction. {text} is replaced with the current field value.
-       */
-      prompt: {
-        type: "string",
-        defaultValue:
-          "Continue and complete the following text naturally. Maintain the same style and tone. Only return the completed text (including the original beginning), no explanations:\n\n{text}"
-      },
       /**
        * Tooltip for the complete button
        */
@@ -92,17 +84,7 @@ export default class AIAutoComplete extends Control {
     try {
       BusyIndicator.show(0);
 
-      const promptTemplate = this.getProperty("prompt") as string;
-      const prompt = promptTemplate.replace("{text}", text);
-
-      const context = getAIModel().bindContext("/processText(...)");
-      context.setParameter("prompt", prompt);
-      context.setParameter("text", text);
-
-      await context.invoke();
-
-      const result = context.getBoundContext().getObject() as { value: string } | undefined;
-      const completedText = result?.value || "";
+      const completedText = await callAIService("autocomplete", text);
 
       this.setProperty("value", completedText);
 
@@ -129,7 +111,6 @@ export default class AIAutoComplete extends Control {
 }
 
 interface $AIAutoCompleteSettings {
-  prompt?: string;
   buttonTooltip?: string;
   value?: string;
   textCompleted?: (event: AIAutoComplete$TextCompletedEvent) => void;
