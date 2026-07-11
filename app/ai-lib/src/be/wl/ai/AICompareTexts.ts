@@ -22,11 +22,6 @@ export default class AICompareTexts extends AIBaseButton {
 
   static readonly metadata: MetadataOptions = {
     properties: {
-      prompt: {
-        type: "string",
-        defaultValue:
-          "Compare the following two texts. Provide a clear analysis in HTML format with these sections:\n<h4>Key Differences</h4>\n<ul><li>...</li></ul>\n<h4>Similarities</h4>\n<ul><li>...</li></ul>\n<h4>Summary</h4>\n<p>A brief overall assessment.</p>\n\nText 1:\n{text1}\n\nText 2:\n{text2}"
-      },
       dialogTitle: {
         type: "string",
         defaultValue: "Compare Texts with AI"
@@ -59,6 +54,10 @@ export default class AICompareTexts extends AIBaseButton {
     super(idOrSettings as string, settings);
   }
 
+  protected getOperation(): string {
+    return "compare";
+  }
+
   protected getDefaultIcon(): string {
     return "sap-icon://compare";
   }
@@ -85,14 +84,7 @@ export default class AICompareTexts extends AIBaseButton {
     try {
       BusyIndicator.show(0);
 
-      const promptTemplate = this.getProperty("prompt") as string;
-      const prompt = promptTemplate
-        .replace("{text1}", text1)
-        .replace("{text2}", text2);
-
-      const combinedText = `Text 1:\n${text1}\n\nText 2:\n${text2}`;
-
-      let html = await this.callAI(prompt, combinedText);
+      let html = await this.callAI(text1, { text2: text2 });
       html = html.replace(/^```html\s*\n?/i, "").replace(/\n?```\s*$/i, "");
       this.comparisonHtml = html;
 
@@ -138,7 +130,6 @@ export default class AICompareTexts extends AIBaseButton {
 }
 
 interface $AICompareTextsSettings extends $AIBaseButtonSettings {
-  prompt?: string;
   dialogTitle?: string;
   value1?: string;
   value2?: string;

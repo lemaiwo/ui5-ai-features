@@ -10,7 +10,7 @@ import BusyIndicator from "sap/ui/core/BusyIndicator";
 import type { Button$PressEvent } from "sap/m/Button";
 import Control from "sap/ui/core/Control";
 import type { MetadataOptions } from "sap/ui/base/ManagedObject";
-import { getAIModel } from "./AIModel";
+import { callAIService, AICallOptions } from "./AIModel";
 
 /**
  * AIBaseButton - Abstract base class for AI-powered button controls.
@@ -24,10 +24,6 @@ export default class AIBaseButton extends Button {
 
   static readonly metadata: MetadataOptions = {
     properties: {
-      prompt: {
-        type: "string",
-        defaultValue: ""
-      },
       value: {
         type: "string",
         defaultValue: ""
@@ -59,6 +55,14 @@ export default class AIBaseButton extends Button {
   }
 
   // --- Overridable hooks ---
+
+  /**
+   * Key of the server-side prompt template this control invokes.
+   * Prompts are maintained in the backend — controls only select an operation.
+   */
+  protected getOperation(): string {
+    return "";
+  }
 
   protected getDefaultIcon(): string {
     return "sap-icon://ai";
@@ -93,10 +97,7 @@ export default class AIBaseButton extends Button {
   protected async processText(inputText: string): Promise<void> {
     try {
       BusyIndicator.show(0);
-      this.resultText = await this.callAI(
-        this.getProperty("prompt") as string,
-        inputText
-      );
+      this.resultText = await this.callAI(inputText);
       this.showResultDialog();
     } catch (error) {
       console.error("Error processing text:", error);
@@ -141,13 +142,8 @@ export default class AIBaseButton extends Button {
 
   // --- Concrete shared methods ---
 
-  protected async callAI(prompt: string, text: string): Promise<string> {
-    const context = getAIModel().bindContext("/processText(...)");
-    context.setParameter("prompt", prompt);
-    context.setParameter("text", text);
-    await context.invoke();
-    const result = context.getBoundContext().getObject() as { value: string } | undefined;
-    return result?.value || "";
+  protected async callAI(text: string, options?: AICallOptions): Promise<string> {
+    return callAIService(this.getOperation(), text, options);
   }
 
   protected showResultDialog(): void {
@@ -219,7 +215,6 @@ export default class AIBaseButton extends Button {
 }
 
 interface $AIBaseButtonSettings extends $ButtonSettings {
-  prompt?: string;
   value?: string;
   dialogTitle?: string;
   outputLabel?: string;

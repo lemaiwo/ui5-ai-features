@@ -10,7 +10,7 @@ import VBox from "sap/m/VBox";
 import Label from "sap/m/Label";
 import MessageToast from "sap/m/MessageToast";
 import BusyIndicator from "sap/ui/core/BusyIndicator";
-import { getAIModel } from "./AIModel";
+import { callAIService } from "./AIModel";
 import type { MetadataOptions } from "sap/ui/base/ManagedObject";
 import type { Menu$ItemSelectedEvent } from "sap/m/Menu";
 
@@ -43,11 +43,6 @@ export default class AIToneButton extends MenuButton {
 
   static readonly metadata: MetadataOptions = {
     properties: {
-      prompt: {
-        type: "string",
-        defaultValue:
-          "Rewrite the following text in a {tone} tone ({toneDescription}). Preserve the original meaning and key information. Only return the rewritten text, no explanations."
-      },
       dialogTitle: {
         type: "string",
         defaultValue: "Change Text Tone with AI"
@@ -126,19 +121,9 @@ export default class AIToneButton extends MenuButton {
     try {
       BusyIndicator.show(0);
 
-      const promptTemplate = this.getProperty("prompt") as string;
-      const prompt = promptTemplate
-        .replace("{tone}", tone.text.toLowerCase())
-        .replace("{toneDescription}", tone.description);
-
-      const context = getAIModel().bindContext("/processText(...)");
-      context.setParameter("prompt", prompt);
-      context.setParameter("text", inputText);
-
-      await context.invoke();
-
-      const result = context.getBoundContext().getObject() as { value: string } | undefined;
-      this._resultText = result?.value || "";
+      this._resultText = await callAIService("tone", inputText, {
+        option: tone.key
+      });
 
       this._showResultDialog(tone.text);
     } catch (error) {
@@ -222,7 +207,6 @@ export default class AIToneButton extends MenuButton {
 }
 
 interface $AIToneButtonSettings extends $MenuButtonSettings {
-  prompt?: string;
   dialogTitle?: string;
   outputLabel?: string;
   value?: string;

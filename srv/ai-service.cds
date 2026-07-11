@@ -1,15 +1,20 @@
 /**
- * AI Service - Generic service for AI-powered text operations
+ * AI Service - Service for AI-powered text operations
  * Connects to SAP AI Core via the Orchestration Service
+ *
+ * Prompts are maintained server-side (see srv/ai-service.js) — clients only
+ * select a predefined operation and, where applicable, an allowlisted option.
  */
 service AIService {
 
     /**
-     * Process text using AI with a given prompt instruction
-     * @param prompt - The instruction for the AI (e.g., "Polish this text", "Make it more formal")
+     * Process text using a predefined AI operation
+     * @param operation - Key of a server-side prompt template (e.g., "polish", "summarize", "translate")
      * @param text - The text to process
+     * @param text2 - Second text for two-text operations ("compare", "spellcheckSummary")
+     * @param option - Allowlisted option for parameterized operations (language key for "translate", tone key for "tone")
      * @returns The AI-processed text
      */
-    action processText(prompt : String, text : LargeString) returns LargeString;
+    action processText(operation : String(30), text : LargeString, text2 : LargeString, option : String(30)) returns LargeString;
 
 }

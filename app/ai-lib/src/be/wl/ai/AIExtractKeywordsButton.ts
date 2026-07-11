@@ -25,11 +25,6 @@ export default class AIExtractKeywordsButton extends AIBaseButton {
 
   static readonly metadata: MetadataOptions = {
     properties: {
-      prompt: {
-        type: "string",
-        defaultValue:
-          "Extract the most important keywords and key phrases from the following text. Return them as a comma-separated list. Only return the keywords, no explanations or numbering."
-      },
       dialogTitle: {
         type: "string",
         defaultValue: "Extract Keywords with AI"
@@ -58,6 +53,10 @@ export default class AIExtractKeywordsButton extends AIBaseButton {
     super(idOrSettings as string, settings);
   }
 
+  protected getOperation(): string {
+    return "keywords";
+  }
+
   protected getDefaultIcon(): string {
     return "sap-icon://tags";
   }
@@ -78,10 +77,7 @@ export default class AIExtractKeywordsButton extends AIBaseButton {
     try {
       BusyIndicator.show(0);
 
-      const rawKeywords = await this.callAI(
-        this.getProperty("prompt") as string,
-        inputText
-      );
+      const rawKeywords = await this.callAI(inputText);
 
       this.keywords = rawKeywords
         .split(",")
@@ -164,7 +160,6 @@ export default class AIExtractKeywordsButton extends AIBaseButton {
 }
 
 interface $AIExtractKeywordsButtonSettings extends $AIBaseButtonSettings {
-  prompt?: string;
   dialogTitle?: string;
   outputLabel?: string;
   value?: string;

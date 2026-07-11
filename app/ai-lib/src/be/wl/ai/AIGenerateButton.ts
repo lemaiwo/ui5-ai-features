@@ -17,11 +17,6 @@ export default class AIGenerateButton extends AIBaseButton {
 
   static readonly metadata: MetadataOptions = {
     properties: {
-      prompt: {
-        type: "string",
-        defaultValue:
-          "Generate well-written, professional text based on the following description. Be detailed and comprehensive. Only return the generated text, no meta-commentary:\n\n{description}"
-      },
       dialogTitle: {
         type: "string",
         defaultValue: "Generate Text with AI"
@@ -46,6 +41,10 @@ export default class AIGenerateButton extends AIBaseButton {
     super(idOrSettings as string, settings);
   }
 
+  protected getOperation(): string {
+    return "generate";
+  }
+
   protected getDefaultIcon(): string {
     return "sap-icon://create";
   }
@@ -65,9 +64,7 @@ export default class AIGenerateButton extends AIBaseButton {
   protected async processText(description: string): Promise<void> {
     try {
       BusyIndicator.show(0);
-      const promptTemplate = this.getProperty("prompt") as string;
-      const prompt = promptTemplate.replace("{description}", description);
-      this.resultText = await this.callAI(prompt, description);
+      this.resultText = await this.callAI(description);
       this.showResultDialog();
     } catch (error) {
       console.error("Error generating text:", error);
@@ -86,7 +83,6 @@ export default class AIGenerateButton extends AIBaseButton {
 }
 
 interface $AIGenerateButtonSettings extends $AIBaseButtonSettings {
-  prompt?: string;
   dialogTitle?: string;
   outputLabel?: string;
   value?: string;
