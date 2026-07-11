@@ -19,7 +19,7 @@ module.exports = class AIService extends cds.ApplicationService {
       const orchestrationClient = new OrchestrationClient({
         promptTemplating: {
           model: {
-            name: "gpt-4o",
+            name: "anthropic--claude-4.6-sonnet",
             params: {
               max_tokens: 4096,
               temperature: 0.7
