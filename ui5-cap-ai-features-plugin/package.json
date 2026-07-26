@@ -1,0 +1,49 @@
+{
+  "name": "ui5-cap-ai-features-plugin",
+  "version": "1.0.0",
+  "description": "CAP plugin providing an AI text-processing service (polish, summarize, translate, ...) backed by SAP AI Core's Orchestration Service",
+  "main": "cds-plugin.js",
+  "homepage": "https://github.com/lemaiwo/ui5-ai-features",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lemaiwo/ui5-ai-features.git",
+    "directory": "ui5-cap-ai-features-plugin"
+  },
+  "author": "Wouter Lemaire",
+  "license": "MIT",
+  "keywords": [
+    "sap",
+    "cap",
+    "cds",
+    "plugin",
+    "cds-plugin",
+    "cap-plugin",
+    "ai",
+    "sap-ai-core",
+    "orchestration"
+  ],
+  "files": [
+    "cds-plugin.js",
+    "index.cds",
+    "srv"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@sap-ai-sdk/orchestration": "^2"
+  },
+  "peerDependencies": {
+    "@sap/cds": ">=8"
+  },
+  "cds": {
+    "requires": {
+      "ui5-cap-ai-features-plugin": {
+        "model": "ui5-cap-ai-features-plugin"
+      },
+      "AICORE": {
+        "kind": "aicore"
+      }
+    }
+  }
+}

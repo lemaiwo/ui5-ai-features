@@ -6,6 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 SAP CAP (Cloud Application Programming Model) + SAPUI5 TypeScript application that provides AI-powered text processing features via SAP AI Core's Orchestration Service. The app namespace is `be.wl.ai.aidemo`.
 
+The reusable parts are packaged for npm distribution and consumed by the demo via npm workspaces:
+- **`app/ai-lib`** → npm package `be.wl.ai` (UI5 control library, prebuilt `dist/` is shipped; `prepublishOnly` runs the build)
+- **`ui5-cap-ai-features-plugin/`** → npm package `ui5-cap-ai-features-plugin` (CDS plugin providing the AI backend service)
+
 ## Commands
 
 ### Local Development
@@ -39,8 +43,9 @@ cd app/aidemo && npx eslint . # UI5 app has its own ESLint config (@sap-ux/eslin
 
 - **`db/schema.cds`** - Domain model (Books entity in `my.bookshop` namespace)
 - **`srv/cat-service.cds`** - CatalogService exposing Books as read-only projection
-- **`srv/ai-service.cds`** - AIService with `processText(operation, text, text2, option)` action. Prompts are maintained server-side in a registry in `srv/ai-service.js` — clients send an operation key (e.g. `polish`, `translate`) plus an allowlisted `option` (language/tone key) where applicable. The handler enforces input length limits and per-user rate limiting, and returns generic error messages.
-- **`srv/ai-service.js`** - Implementation using `@sap-ai-sdk/orchestration` `OrchestrationClient` to call GPT-4o via SAP AI Core
+- **`ui5-cap-ai-features-plugin/`** - CDS plugin (auto-discovered via `cds-plugin.js`) that provides the AIService. Its `index.cds` model is auto-loaded through the `cds.requires` entry in the plugin's package.json, which also contributes the `AICORE` service requirement.
+  - **`srv/ai-service.cds`** - AIService with `processText(operation, text, text2, option)` action, bound to its implementation via `@impl`. Prompts are maintained server-side in a registry in `srv/ai-service.js` — clients send an operation key (e.g. `polish`, `translate`) plus an allowlisted `option` (language/tone key) where applicable. The handler enforces input length limits and per-user rate limiting, and returns generic error messages.
+  - **`srv/ai-service.js`** - Implementation using `@sap-ai-sdk/orchestration` `OrchestrationClient` to call SAP AI Core. Model name, token/temperature params, text-length limit, and rate limits are overridable via the consuming project's `cds.ai` config section.
 
 The CAP server exposes two OData V4 services: `/odata/v4/catalog/` and `/odata/v4/ai/`.
 
@@ -59,7 +64,7 @@ Deployed as a Multi-Target Application to SAP BTP Cloud Foundry. Modules: CAP se
 
 ### Workspace Structure
 
-npm workspaces configured with `app/*`. The `app/router` package is the SAP App Router. The `cds-plugin-ui5` dev dependency serves the UI5 app through the CDS server during development.
+npm workspaces configured with `app/*` and `ui5-cap-ai-features-plugin`. The `app/router` package is the SAP App Router. The `cds-plugin-ui5` dev dependency serves the UI5 app through the CDS server during development. The root project depends on `ui5-cap-ai-features-plugin`, resolved to the workspace folder locally (must be published to npm for MTA builds outside the workspace).
 
 ## Key Patterns
 

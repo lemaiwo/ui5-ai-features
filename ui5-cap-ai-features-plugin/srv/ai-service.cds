@@ -2,9 +2,10 @@
  * AI Service - Service for AI-powered text operations
  * Connects to SAP AI Core via the Orchestration Service
  *
- * Prompts are maintained server-side (see srv/ai-service.js) — clients only
+ * Prompts are maintained server-side (see ai-service.js) — clients only
  * select a predefined operation and, where applicable, an allowlisted option.
  */
+@impl: 'ui5-cap-ai-features-plugin/srv/ai-service.js'
 service AIService {
 
     /**

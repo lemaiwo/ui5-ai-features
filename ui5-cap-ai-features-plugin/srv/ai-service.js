@@ -3,12 +3,24 @@ const { OrchestrationClient } = require("@sap-ai-sdk/orchestration");
 
 const LOG = cds.log("ai-service");
 
-// Hard limits to keep token consumption (and cost) bounded
-const MAX_TEXT_LENGTH = 20000;
-const RATE_LIMIT_WINDOW_MS = 60 * 1000;
-const RATE_LIMIT_MAX_REQUESTS = 20;
+// Defaults, overridable by the consuming project via the `cds.ai` section in
+// its package.json (or .cdsrc.json), e.g. { "cds": { "ai": { "model": "..." } } }
+const DEFAULTS = {
+  model: "anthropic--claude-4.6-sonnet",
+  maxTokens: 4096,
+  temperature: 0.7,
+  maxTextLength: 20000,
+  rateLimitWindowMs: 60 * 1000,
+  rateLimitMaxRequests: 20
+};
+const CONFIG = { ...DEFAULTS, ...(cds.env.ai || {}) };
 
-// Allowlisted option values — must stay in sync with the UI controls in app/ai-lib
+// Hard limits to keep token consumption (and cost) bounded
+const MAX_TEXT_LENGTH = CONFIG.maxTextLength;
+const RATE_LIMIT_WINDOW_MS = CONFIG.rateLimitWindowMs;
+const RATE_LIMIT_MAX_REQUESTS = CONFIG.rateLimitMaxRequests;
+
+// Allowlisted option values — must stay in sync with the UI controls in the be.wl.ai UI5 library
 const LANGUAGES = {
   en: "English",
   de: "German",
@@ -38,6 +50,7 @@ const TONES = {
 /**
  * Server-side prompt registry. The client only sends an operation key (plus an
  * allowlisted option where applicable) — never free-text instructions.
+ * Kept in sync with the UI controls of the companion UI5 library `be.wl.ai`.
  *
  * Each entry defines:
  * - instruction(option): the prompt instruction sent to the model
@@ -193,10 +206,10 @@ module.exports = class AIService extends cds.ApplicationService {
       const orchestrationClient = new OrchestrationClient({
         promptTemplating: {
           model: {
-            name: "anthropic--claude-4.6-sonnet",
+            name: CONFIG.model,
             params: {
-              max_tokens: 4096,
-              temperature: 0.7
+              max_tokens: CONFIG.maxTokens,
+              temperature: CONFIG.temperature
             }
           }
         }

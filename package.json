@@ -7,9 +7,9 @@
   "private": true,
   "dependencies": {
     "@sap/cds": "^8",
-    "@sap-ai-sdk/orchestration": "^2",
     "express": "^4",
-    "@sap/xssec": "^4"
+    "@sap/xssec": "^4",
+    "ui5-cap-ai-features-plugin": "^1.0.0"
   },
   "devDependencies": {
     "@cap-js/cds-types": "^0.8.0",
@@ -39,13 +39,11 @@
       },
       "connectivity": true,
       "destinations": true,
-      "html5-repo": true,
-      "AICORE": {
-        "kind": "aicore"
-      }
+      "html5-repo": true
     }
   },
   "workspaces": [
-    "app/*"
+    "app/*",
+    "ui5-cap-ai-features-plugin"
   ]
 }

@@ -1,8 +1,29 @@
 {
   "name": "be.wl.ai",
-  "version": "0.1.0",
-  "description": "UI5 library providing AI-powered controls for text processing",
-  "private": true,
+  "version": "1.0.0",
+  "description": "UI5 library providing AI-powered controls for text processing, backed by SAP AI Core via the ui5-cap-ai-features-plugin CAP plugin",
+  "author": "Wouter Lemaire",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/lemaiwo/ui5-ai-features",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lemaiwo/ui5-ai-features.git",
+    "directory": "app/ai-lib"
+  },
+  "keywords": [
+    "ui5",
+    "openui5",
+    "sapui5",
+    "ui5-library",
+    "ai",
+    "sap-ai-core",
+    "cap"
+  ],
+  "files": [
+    "dist",
+    "src",
+    "ui5.yaml"
+  ],
   "devDependencies": {
     "@sapui5/types": "~1.144.0",
     "@ui5/cli": "^4",
@@ -12,7 +33,8 @@
     "ui5-task-zipper": "^3"
   },
   "scripts": {
-		"build": "ui5 build  --config ui5-build.yaml --clean-dest",
-    "build:cf": "ui5 build --config ui5-deploy.yaml"
+    "build": "ui5 build --config ui5-build.yaml --clean-dest",
+    "build:cf": "ui5 build --config ui5-deploy.yaml",
+    "prepublishOnly": "npm run build"
   }
 }
