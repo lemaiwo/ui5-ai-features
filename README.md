@@ -47,6 +47,12 @@ Backend (CAP):
 npm install ui5-cap-ai-features-plugin
 ```
 
+then enable it in your project's cds configuration:
+
+```json
+"cds": { "requires": { "ai-features": true } }
+```
+
 Frontend (UI5 app):
 
 ```sh

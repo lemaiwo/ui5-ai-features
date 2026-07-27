@@ -38,11 +38,10 @@
   },
   "cds": {
     "requires": {
-      "ui5-cap-ai-features-plugin": {
-        "model": "ui5-cap-ai-features-plugin"
-      },
-      "AICORE": {
-        "kind": "aicore"
+      "kinds": {
+        "ai-features": {
+          "model": "ui5-cap-ai-features-plugin"
+        }
       }
     }
   }

@@ -43,7 +43,7 @@ cd app/aidemo && npx eslint . # UI5 app has its own ESLint config (@sap-ux/eslin
 
 - **`db/schema.cds`** - Domain model (Books entity in `my.bookshop` namespace)
 - **`srv/cat-service.cds`** - CatalogService exposing Books as read-only projection
-- **`ui5-cap-ai-features-plugin/`** - CDS plugin (auto-discovered via `cds-plugin.js`) that provides the AIService. Its `index.cds` model is auto-loaded through the `cds.requires` entry in the plugin's package.json, which also contributes the `AICORE` service requirement.
+- **`ui5-cap-ai-features-plugin/`** - CDS plugin that provides the AIService. Opt-in: it only activates when the consuming project sets `"ai-features": true` in its `cds.requires` (the plugin ships a `cds.requires.kinds` preset that loads its `index.cds` model; its `cds-plugin.js` then contributes the `AICORE` service requirement). Setting the entry to `false` or removing it makes the installed plugin fully inert.
   - **`srv/ai-service.cds`** - AIService with `processText(operation, text, text2, option)` action, bound to its implementation via `@impl`. Prompts are maintained server-side in a registry in `srv/ai-service.js` — clients send an operation key (e.g. `polish`, `translate`) plus an allowlisted `option` (language/tone key) where applicable. The handler enforces input length limits and per-user rate limiting, and returns generic error messages.
   - **`srv/ai-service.js`** - Implementation using `@sap-ai-sdk/orchestration` `OrchestrationClient` to call SAP AI Core. Model name, token/temperature params, text-length limit, and rate limits are overridable via the consuming project's `cds.ai` config section.
 

@@ -6,7 +6,7 @@ It is the backend counterpart of the [`be.wl.ai`](https://www.npmjs.com/package/
 
 ## What you get
 
-Simply installing the plugin serves an `AIService` at `/odata/v4/ai` with a single action:
+Once enabled (see below), the plugin serves an `AIService` at `/odata/v4/ai` with a single action:
 
 ```
 POST /odata/v4/ai/processText
@@ -23,12 +23,32 @@ All prompts are maintained server-side in the plugin — clients only send an op
 npm install ui5-cap-ai-features-plugin
 ```
 
-That's it — CAP discovers the plugin automatically (via its `cds-plugin.js`), loads the `AIService` model and serves it. No `using` statement or configuration is required.
-
-The plugin also registers the AI Core service requirement in your project's effective configuration:
+Installing alone does **not** activate anything. Enable the plugin explicitly in your project's cds configuration (`package.json` or `.cdsrc.json`):
 
 ```json
-"AICORE": { "kind": "aicore" }
+{
+  "cds": {
+    "requires": {
+      "ai-features": true
+    }
+  }
+}
+```
+
+Once enabled, CAP loads the `AIService` model from the plugin and serves it — no `using` statement needed. The plugin then also registers the AI Core service requirement (`"AICORE": { "kind": "aicore" }`) in your project's effective configuration, keeping any existing `AICORE` settings (such as a hybrid-profile binding) intact.
+
+### Disabling it again
+
+Set the entry to `false` (or remove it) and the plugin is fully inert — no model is loaded and no service is served, even though the package stays installed:
+
+```json
+"ai-features": false
+```
+
+Since this is a regular `cds.requires` entry, [configuration profiles](https://cap.cloud.sap/docs/node.js/cds-env#profiles) work too — e.g. enable it only during development:
+
+```json
+"[development] ai-features": true
 ```
 
 ## Requirements
