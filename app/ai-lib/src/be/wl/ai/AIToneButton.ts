@@ -10,7 +10,7 @@ import VBox from "sap/m/VBox";
 import Label from "sap/m/Label";
 import MessageToast from "sap/m/MessageToast";
 import BusyIndicator from "sap/ui/core/BusyIndicator";
-import { callAIService } from "./AIModel";
+import { callAIService, getAIModelFor } from "./AIModel";
 import type { MetadataOptions } from "sap/ui/base/ManagedObject";
 import type { Menu$ItemSelectedEvent } from "sap/m/Menu";
 
@@ -122,7 +122,8 @@ export default class AIToneButton extends MenuButton {
       BusyIndicator.show(0);
 
       this._resultText = await callAIService("tone", inputText, {
-        option: tone.key
+        option: tone.key,
+        model: getAIModelFor(this)
       });
 
       this._showResultDialog(tone.text);

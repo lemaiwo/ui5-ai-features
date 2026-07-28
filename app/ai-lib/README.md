@@ -75,11 +75,53 @@ npm install ui5-cap-ai-features-plugin
 
 For any other backend, expose an OData V4 service at `/odata/v4/ai` with a matching `processText(operation, text, text2, option)` action.
 
-### Configuring the service URL
+### How the controls find the AI service
 
-By default the controls call the AI service at `/odata/v4/ai/` — CAP's default path for the plugin's `AIService`. This works out of the box when the app is served from the same origin as the CAP backend: during local development (`cds watch` serves both) as well as deployed behind an app router with the usual `^/odata/(.*)` route.
+The controls resolve their OData model in this order:
 
-If your setup exposes the service under a different prefix (e.g. a destination route like `/backend/odata/v4/ai`), set the URL once before the first AI control is used, e.g. in `Component.init`:
+1. **A model named `ai`** propagated to the control (e.g. defined in your app's `manifest.json`) — used automatically whenever present.
+2. The library's shared singleton, targeting the URL set via `setAIServiceUrl(url)`.
+3. Default: `/odata/v4/ai/` on the same origin — CAP's default path for the plugin's `AIService`. Works out of the box when the app is served from the same origin as the CAP backend: local development (`cds watch` serves both) and deployments behind one app router.
+
+### Consuming from a separate deployment (SAP Build Work Zone)
+
+The backend and the app do **not** have to live in the same MTA/monorepo. A typical setup: one "provider" MTA deploys the CAP service (with `ui5-cap-ai-features-plugin`) and this library to the HTML5 Application Repository; other UI5 apps in their own MTAs consume both via Work Zone:
+
+1. **Library resolution:** declare `"be.wl.ai": {}` under `sap.ui5/dependencies/libs`. When both the library and your app are deployed to the HTML5 Application Repository in the same subaccount (or shared via content federation), the Work Zone runtime resolves the library from the provider's deployment — no bundling needed.
+
+2. **Service connectivity:** create a destination to the provider's CAP service and add a route to your app's `xs-app.json`:
+
+   ```json
+   {
+     "source": "^/odata/v4/ai/(.*)$",
+     "target": "/odata/v4/ai/$1",
+     "destination": "ai-features-srv",
+     "authenticationType": "xsuaa"
+   }
+   ```
+
+3. **Model:** under the managed app router, routes are scoped to your app's path, so define the service as an app-relative dataSource and name the model `ai` in your `manifest.json` — the controls pick it up automatically:
+
+   ```json
+   "sap.app": {
+     "dataSources": {
+       "aiService": {
+         "uri": "odata/v4/ai/",
+         "type": "OData",
+         "settings": { "odataVersion": "4.0" }
+       }
+     }
+   },
+   "sap.ui5": {
+     "models": {
+       "ai": { "dataSource": "aiService" }
+     }
+   }
+   ```
+
+   Note the **relative** URI (no leading slash) — it resolves against your app's base path and therefore hits the route from step 2.
+
+Alternatively, without a named model, set an explicit URL once before the first AI control is used, e.g. in `Component.init`:
 
 ```ts
 import { setAIServiceUrl } from "be/wl/ai/AIModel";

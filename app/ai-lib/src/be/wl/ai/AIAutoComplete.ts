@@ -3,7 +3,7 @@ import type RenderManager from "sap/ui/core/RenderManager";
 import Button from "sap/m/Button";
 import MessageToast from "sap/m/MessageToast";
 import BusyIndicator from "sap/ui/core/BusyIndicator";
-import { callAIService } from "./AIModel";
+import { callAIService, getAIModelFor } from "./AIModel";
 import type { MetadataOptions } from "sap/ui/base/ManagedObject";
 
 /**
@@ -84,7 +84,7 @@ export default class AIAutoComplete extends Control {
     try {
       BusyIndicator.show(0);
 
-      const completedText = await callAIService("autocomplete", text);
+      const completedText = await callAIService("autocomplete", text, { model: getAIModelFor(this) });
 
       this.setProperty("value", completedText);
 

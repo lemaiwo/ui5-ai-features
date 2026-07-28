@@ -1,4 +1,5 @@
 import ODataModel from "sap/ui/model/odata/v4/ODataModel";
+import type ManagedObject from "sap/ui/base/ManagedObject";
 
 /**
  * Shared ODataModel singleton for the AI service.
@@ -38,9 +39,34 @@ export function getAIModel(): ODataModel {
   return model;
 }
 
+/**
+ * Name of the model the AI controls look for on themselves (propagated from
+ * the view/component) before falling back to the library's own singleton.
+ * Consuming apps can define an OData V4 model named "ai" in their manifest —
+ * with a dataSource URI resolved relative to the app — and all AI controls
+ * will use it automatically. This is the recommended setup when the app and
+ * the CAP backend are deployed separately (e.g. behind SAP Build Work Zone,
+ * connected through a destination route).
+ */
+export const AI_MODEL_NAME = "ai";
+
+/**
+ * Resolve the OData model to use for a given control: the nearest model named
+ * "ai" if one is provided by the app, otherwise the shared singleton.
+ */
+export function getAIModelFor(requestor?: ManagedObject): ODataModel {
+  const contextual = requestor?.getModel(AI_MODEL_NAME);
+  if (contextual instanceof ODataModel) {
+    return contextual;
+  }
+  return getAIModel();
+}
+
 export interface AICallOptions {
   text2?: string;
   option?: string;
+  /** Model to use for the call — defaults to the shared singleton */
+  model?: ODataModel;
 }
 
 /**
@@ -53,7 +79,7 @@ export async function callAIService(
   text: string,
   options?: AICallOptions
 ): Promise<string> {
-  const context = getAIModel().bindContext("/processText(...)");
+  const context = (options?.model ?? getAIModel()).bindContext("/processText(...)");
   context.setParameter("operation", operation);
   context.setParameter("text", text);
   if (options?.text2 !== undefined) {

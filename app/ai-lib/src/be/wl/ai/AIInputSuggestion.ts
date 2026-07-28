@@ -7,7 +7,7 @@ import HBox from "sap/m/HBox";
 import TextArea from "sap/m/TextArea";
 import Text from "sap/m/Text";
 import MessageToast from "sap/m/MessageToast";
-import { callAIService } from "./AIModel";
+import { callAIService, getAIModelFor } from "./AIModel";
 import type { MetadataOptions } from "sap/ui/base/ManagedObject";
 
 /**
@@ -157,7 +157,7 @@ export default class AIInputSuggestion extends Control {
     try {
       this._popover?.setBusy(true);
 
-      const suggestion = await callAIService("suggest", text);
+      const suggestion = await callAIService("suggest", text, { model: getAIModelFor(this) });
 
       this._suggestionTextArea?.setValue(suggestion);
     } catch (error) {

@@ -4,7 +4,7 @@ import Button from "sap/m/Button";
 import ObjectStatus from "sap/m/ObjectStatus";
 import HBox from "sap/m/HBox";
 import MessageToast from "sap/m/MessageToast";
-import { callAIService } from "./AIModel";
+import { callAIService, getAIModelFor } from "./AIModel";
 import type { MetadataOptions } from "sap/ui/base/ManagedObject";
 import { ValueState } from "sap/ui/core/library";
 
@@ -194,7 +194,7 @@ export default class AISentimentIndicator extends Control {
         this._button.setBusy(true);
       }
 
-      const rawResult = await callAIService("sentiment", textToAnalyze);
+      const rawResult = await callAIService("sentiment", textToAnalyze, { model: getAIModelFor(this) });
       const rawSentiment = rawResult.trim().toLowerCase();
 
       let sentiment: SentimentValue = "neutral";
