@@ -5,7 +5,7 @@
  * Prompts are maintained server-side (see ai-service.js) — clients only
  * select a predefined operation and, where applicable, an allowlisted option.
  */
-@impl: 'ui5-cap-ai-features-plugin/srv/ai-service.js'
+@impl: 'ui5-cap-ai-features/srv/ai-service.js'
 service AIService {
 
     /**

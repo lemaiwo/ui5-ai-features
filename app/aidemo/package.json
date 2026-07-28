@@ -9,7 +9,7 @@
   ],
   "main": "webapp/index.html",
   "dependencies": {
-    "be.wl.ai": "*"
+    "ui5-cap-ai-features": "^1.0.0"
   },
   "devDependencies": {
     "@ui5/cli": "^4.0.33",

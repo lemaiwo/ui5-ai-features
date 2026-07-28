@@ -12,7 +12,7 @@ let serviceUrl = "/odata/v4/ai/";
 
 /**
  * Override the URL of the AI OData service. Defaults to "/odata/v4/ai/", which
- * matches where ui5-cap-ai-features-plugin serves the AIService when the app is
+ * matches where the ui5-cap-ai-features CDS plugin serves the AIService when the app is
  * reached through the same origin as the CAP backend (e.g. behind an app router).
  * Call this early — e.g. in Component.init — if your setup exposes the service
  * under a different path.

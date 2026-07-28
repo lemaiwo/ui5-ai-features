@@ -1,6 +1,11 @@
-# be.wl.ai — AI Controls Library for UI5
+# ui5-cap-ai-features
 
-A UI5 library (TypeScript, works with SAPUI5 and OpenUI5) providing ready-to-use AI-powered controls for text processing:
+AI-powered text processing for CAP + UI5 applications — **one npm package containing both halves**:
+
+- a **CAP CDS plugin** that serves an `AIService` (`/odata/v4/ai`) backed by SAP AI Core's Orchestration Service
+- the **`be.wl.ai` UI5 control library** (TypeScript, SAPUI5/OpenUI5) with ready-to-use AI controls that call exactly that service
+
+Because both ship together in one version, the client/server contract (operation keys, action signature) can never drift.
 
 | Control | Purpose |
 |---|---|
@@ -16,17 +21,79 @@ A UI5 library (TypeScript, works with SAPUI5 and OpenUI5) providing ready-to-use
 | `AIAutoComplete` | TextArea with AI auto-completion |
 | `AISentimentIndicator` | Sentiment analysis indicator |
 
-Each control invokes a fixed server-side operation — prompts live in the backend, not in the client. The backend is provided by the companion CAP plugin [`ui5-cap-ai-features-plugin`](https://www.npmjs.com/package/ui5-cap-ai-features-plugin), which serves the expected `AIService` at `/odata/v4/ai` on top of SAP AI Core's Orchestration Service.
+All prompts are maintained server-side in the plugin — clients only send an operation key plus, where applicable, an allowlisted option (a language or tone key). The handler enforces input length limits and per-user rate limiting.
 
-## Installation
-
-Add the library to your UI5 app:
+## Backend setup (CAP)
 
 ```sh
-npm install be.wl.ai
+npm install ui5-cap-ai-features @sap-ai-sdk/orchestration
 ```
 
-The published package ships the prebuilt library (`dist/`) together with a `ui5.yaml`, so the UI5 tooling (v3+) picks it up automatically as a framework project dependency — no extra configuration needed for local development with `ui5 serve`.
+(`@sap-ai-sdk/orchestration` is an optional peer dependency so that pure frontend installs stay lean — backend projects install it explicitly.)
+
+Installing alone does **not** activate anything. Enable the plugin in your project's cds configuration (`package.json` or `.cdsrc.json`):
+
+```json
+{
+  "cds": {
+    "requires": {
+      "ai-features": true
+    }
+  }
+}
+```
+
+Once enabled, CAP loads the `AIService` model from the package and serves it at `/odata/v4/ai`:
+
+```
+POST /odata/v4/ai/processText
+{ "operation": "polish", "text": "text to process", "text2": null, "option": null }
+```
+
+Supported operations: `polish`, `summarize`, `translate`, `tone`, `generate`, `spellcheck`, `spellcheckSummary`, `keywords`, `compare`, `suggest`, `autocomplete`, `sentiment`.
+
+The plugin also registers the AI Core service requirement (`"AICORE": { "kind": "aicore" }`), keeping any existing `AICORE` settings (such as a hybrid-profile binding) intact.
+
+Disable it again by setting the entry to `false` (or removing it) — the installed package is then fully inert. Profiles work too, e.g. `"[development] ai-features": true`.
+
+### Requirements
+
+- `@sap/cds` >= 8
+- An SAP AI Core instance (`extended` plan). For local development, bind to it on BTP:
+
+```sh
+cds bind AICORE --to aicore --profile hybrid
+cds watch --profile hybrid
+```
+
+### Configuration
+
+Defaults can be overridden in the `cds.ai` section of your project configuration:
+
+```json
+{
+  "cds": {
+    "ai": {
+      "model": "anthropic--claude-4.6-sonnet",
+      "maxTokens": 4096,
+      "temperature": 0.7,
+      "maxTextLength": 20000,
+      "rateLimitWindowMs": 60000,
+      "rateLimitMaxRequests": 20
+    }
+  }
+}
+```
+
+## Frontend setup (UI5 app)
+
+Add the package to your UI5 app as well:
+
+```sh
+npm install ui5-cap-ai-features
+```
+
+The package ships the prebuilt `be.wl.ai` library (`dist/`) together with a `ui5.yaml`, so the UI5 tooling (v3+) picks it up automatically as a project dependency — no extra configuration for local development with `ui5 serve`. In a CAP monorepo with npm workspaces, the same single install serves both the backend and the app.
 
 Declare the library in your app's `manifest.json`:
 
@@ -40,9 +107,7 @@ Declare the library in your app's `manifest.json`:
 }
 ```
 
-## Usage
-
-Use the controls in your XML views via the `be.wl.ai` namespace. The `value` property supports two-way binding, so accepted AI results are written back to your model:
+Use the controls via the `be.wl.ai` namespace. The `value` property supports two-way binding, so accepted AI results are written back to your model:
 
 ```xml
 <mvc:View
@@ -61,20 +126,6 @@ Use the controls in your XML views via the `be.wl.ai` namespace. The `value` pro
 
 Configurable properties are limited to UI texts (e.g. `dialogTitle`, `outputLabel`) and bindable values — the AI prompts themselves are maintained server-side and cannot be altered from the client.
 
-## Backend requirement
-
-This library is one half of a pair — it is designed for UI5 apps with a CAP backend and does nothing useful without it. The controls call `POST /odata/v4/ai/processText` on the same origin. In a CAP project, install and enable the companion plugin:
-
-```sh
-npm install ui5-cap-ai-features-plugin
-```
-
-```json
-"cds": { "requires": { "ai-features": true } }
-```
-
-For any other backend, expose an OData V4 service at `/odata/v4/ai` with a matching `processText(operation, text, text2, option)` action.
-
 ### How the controls find the AI service
 
 The controls resolve their OData model in this order:
@@ -83,9 +134,9 @@ The controls resolve their OData model in this order:
 2. The library's shared singleton, targeting the URL set via `setAIServiceUrl(url)`.
 3. Default: `/odata/v4/ai/` on the same origin — CAP's default path for the plugin's `AIService`. Works out of the box when the app is served from the same origin as the CAP backend: local development (`cds watch` serves both) and deployments behind one app router.
 
-### Consuming from a separate deployment (SAP Build Work Zone)
+## Consuming from a separate deployment (SAP Build Work Zone)
 
-The backend and the app do **not** have to live in the same MTA/monorepo. A typical setup: one "provider" MTA deploys the CAP service (with `ui5-cap-ai-features-plugin`) and this library to the HTML5 Application Repository; other UI5 apps in their own MTAs consume both via Work Zone:
+The backend and the app do **not** have to live in the same MTA/monorepo. A typical setup: one "provider" MTA deploys the CAP service and the library to the HTML5 Application Repository; other UI5 apps in their own MTAs consume both via Work Zone:
 
 1. **Library resolution:** declare `"be.wl.ai": {}` under `sap.ui5/dependencies/libs`. When both the library and your app are deployed to the HTML5 Application Repository in the same subaccount (or shared via content federation), the Work Zone runtime resolves the library from the provider's deployment — no bundling needed.
 
@@ -136,7 +187,7 @@ export default class Component extends UIComponent {
 
 ## Deploying to SAP BTP from the npm package
 
-The published package ships a ready-to-deploy HTML5 Application Repository archive at `node_modules/be.wl.ai/dist/bewlai.zip` (library resources with `manifest.json`, prebuilt and zipped). That means an MTA can deploy this library **without the library's source and without any UI5 app** — for example a headless "provider" MTA containing only the CAP service (with `ui5-cap-ai-features-plugin`) and the library content for consumption by other apps via SAP Build Work Zone.
+The published package ships a ready-to-deploy HTML5 Application Repository archive at `node_modules/ui5-cap-ai-features/dist/bewlai.zip` (library resources with `manifest.json`, prebuilt and zipped). That means an MTA can deploy the library **without the library's source and even without any UI5 app** — for example a headless "provider" MTA containing only the CAP service and the library content for consumption by other apps via SAP Build Work Zone.
 
 Create a small content folder in your project, e.g. `ai-lib-content/package.json`:
 
@@ -144,9 +195,9 @@ Create a small content folder in your project, e.g. `ai-lib-content/package.json
 {
   "name": "ai-lib-content",
   "private": true,
-  "dependencies": { "be.wl.ai": "^1.0.0" },
+  "dependencies": { "ui5-cap-ai-features": "^1.0.0" },
   "scripts": {
-    "copy-archive": "node -e \"const fs=require('fs');fs.mkdirSync('dist',{recursive:true});fs.copyFileSync('node_modules/be.wl.ai/dist/bewlai.zip','dist/bewlai.zip')\""
+    "copy-archive": "node -e \"const fs=require('fs');fs.mkdirSync('dist',{recursive:true});fs.copyFileSync('node_modules/ui5-cap-ai-features/dist/bewlai.zip','dist/bewlai.zip')\""
   }
 }
 ```
@@ -155,7 +206,7 @@ and wire it into your `mta.yaml` next to the CAP server module:
 
 ```yaml
 modules:
-  # ... your CAP srv module (with ui5-cap-ai-features-plugin enabled) ...
+  # ... your CAP srv module (with ai-features enabled) ...
   - name: ai-provider-app-deployer
     type: com.sap.application.content
     path: gen
@@ -193,14 +244,14 @@ Consumer apps then resolve the library through Work Zone (see the previous secti
 
 ```sh
 npm install
-npm run build     # transpiles TypeScript and builds the library into dist/
+npm run build     # transpiles TypeScript and builds the be.wl.ai library into dist/
 ```
 
-The package's `ui5.yaml` points at `dist/`, so consumers always get the prebuilt resources; `prepublishOnly` makes sure `dist/` is rebuilt before publishing.
+The package's `ui5.yaml` points at `dist/`, so consumers always get the prebuilt resources; `prepublishOnly` rebuilds `dist/` (including the deployable `bewlai.zip`) before publishing.
 
 ## Example
 
-A complete demo project (CAP + SAPUI5 TypeScript app) is available at [lemaiwo/ui5-ai-features](https://github.com/lemaiwo/ui5-ai-features).
+A complete demo project (CAP + SAPUI5 TypeScript app using this package for both halves) is available at [lemaiwo/ui5-ai-features](https://github.com/lemaiwo/ui5-ai-features).
 
 ## License
 
