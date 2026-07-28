@@ -63,13 +63,34 @@ Configurable properties are limited to UI texts (e.g. `dialogTitle`, `outputLabe
 
 ## Backend requirement
 
-The controls call `POST /odata/v4/ai/processText` on the same origin. In a CAP project, simply install the companion plugin:
+This library is one half of a pair — it is designed for UI5 apps with a CAP backend and does nothing useful without it. The controls call `POST /odata/v4/ai/processText` on the same origin. In a CAP project, install and enable the companion plugin:
 
 ```sh
 npm install ui5-cap-ai-features-plugin
 ```
 
+```json
+"cds": { "requires": { "ai-features": true } }
+```
+
 For any other backend, expose an OData V4 service at `/odata/v4/ai` with a matching `processText(operation, text, text2, option)` action.
+
+### Configuring the service URL
+
+By default the controls call the AI service at `/odata/v4/ai/` — CAP's default path for the plugin's `AIService`. This works out of the box when the app is served from the same origin as the CAP backend: during local development (`cds watch` serves both) as well as deployed behind an app router with the usual `^/odata/(.*)` route.
+
+If your setup exposes the service under a different prefix (e.g. a destination route like `/backend/odata/v4/ai`), set the URL once before the first AI control is used, e.g. in `Component.init`:
+
+```ts
+import { setAIServiceUrl } from "be/wl/ai/AIModel";
+
+export default class Component extends UIComponent {
+  public init(): void {
+    super.init();
+    setAIServiceUrl("/backend/odata/v4/ai/");
+  }
+}
+```
 
 ## Development
 

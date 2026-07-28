@@ -7,10 +7,33 @@ import ODataModel from "sap/ui/model/odata/v4/ODataModel";
  * @namespace be.wl.ai
  */
 let model: ODataModel | null = null;
+let serviceUrl = "/odata/v4/ai/";
+
+/**
+ * Override the URL of the AI OData service. Defaults to "/odata/v4/ai/", which
+ * matches where ui5-cap-ai-features-plugin serves the AIService when the app is
+ * reached through the same origin as the CAP backend (e.g. behind an app router).
+ * Call this early — e.g. in Component.init — if your setup exposes the service
+ * under a different path.
+ */
+export function setAIServiceUrl(url: string): void {
+  const normalized = url.endsWith("/") ? url : url + "/";
+  if (normalized !== serviceUrl) {
+    serviceUrl = normalized;
+    if (model) {
+      model.destroy();
+      model = null;
+    }
+  }
+}
+
+export function getAIServiceUrl(): string {
+  return serviceUrl;
+}
 
 export function getAIModel(): ODataModel {
   if (!model) {
-    model = new ODataModel({ serviceUrl: "/odata/v4/ai/" });
+    model = new ODataModel({ serviceUrl });
   }
   return model;
 }

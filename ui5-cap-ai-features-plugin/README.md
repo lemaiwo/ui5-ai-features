@@ -108,7 +108,7 @@ and drop the controls into your views:
 </mvc:View>
 ```
 
-The controls call `POST /odata/v4/ai/processText` — exactly what this plugin serves.
+The controls call `POST /odata/v4/ai/processText` — exactly what this plugin serves. If your app reaches the CAP backend under a different path prefix, point the library there once via its `setAIServiceUrl` function (see the [`be.wl.ai` README](https://www.npmjs.com/package/be.wl.ai)).
 
 ## Example
 
