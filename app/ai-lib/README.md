@@ -134,6 +134,61 @@ export default class Component extends UIComponent {
 }
 ```
 
+## Deploying to SAP BTP from the npm package
+
+The published package ships a ready-to-deploy HTML5 Application Repository archive at `node_modules/be.wl.ai/dist/bewlai.zip` (library resources with `manifest.json`, prebuilt and zipped). That means an MTA can deploy this library **without the library's source and without any UI5 app** — for example a headless "provider" MTA containing only the CAP service (with `ui5-cap-ai-features-plugin`) and the library content for consumption by other apps via SAP Build Work Zone.
+
+Create a small content folder in your project, e.g. `ai-lib-content/package.json`:
+
+```json
+{
+  "name": "ai-lib-content",
+  "private": true,
+  "dependencies": { "be.wl.ai": "^1.0.0" },
+  "scripts": {
+    "copy-archive": "node -e \"const fs=require('fs');fs.mkdirSync('dist',{recursive:true});fs.copyFileSync('node_modules/be.wl.ai/dist/bewlai.zip','dist/bewlai.zip')\""
+  }
+}
+```
+
+and wire it into your `mta.yaml` next to the CAP server module:
+
+```yaml
+modules:
+  # ... your CAP srv module (with ui5-cap-ai-features-plugin enabled) ...
+  - name: ai-provider-app-deployer
+    type: com.sap.application.content
+    path: gen
+    requires:
+      - name: ai-provider-html5-repo-host
+        parameters:
+          content-target: true
+    build-parameters:
+      build-result: app/
+      requires:
+        - artifacts: [bewlai.zip]
+          name: bewlai
+          target-path: app/
+  - name: bewlai
+    type: html5
+    path: ai-lib-content
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm install
+        - npm run copy-archive
+      supported-platforms: []
+resources:
+  - name: ai-provider-html5-repo-host
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-plan: app-host
+```
+
+Consumer apps then resolve the library through Work Zone (see the previous section) and reach the CAP service via a destination pointing at the provider's `srv` URL. The same copy-archive trick also works inside a *consumer's* MTA if you prefer each app to deploy its own copy of the library instead of consuming a centrally provisioned one.
+
 ## Development
 
 ```sh

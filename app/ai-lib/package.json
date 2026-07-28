@@ -35,6 +35,6 @@
   "scripts": {
     "build": "ui5 build --config ui5-build.yaml --clean-dest",
     "build:cf": "ui5 build --config ui5-deploy.yaml",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build && npm run build:cf"
   }
 }
