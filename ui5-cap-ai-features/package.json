@@ -1,0 +1,71 @@
+{
+  "name": "ui5-cap-ai-features",
+  "version": "1.0.0",
+  "description": "AI text-processing features for CAP + UI5 apps in one package: a CDS plugin serving an AI service backed by SAP AI Core, and the be.wl.ai UI5 control library (AI Polish Button, AI Translate Button, AI Autocomplete, ...) that consumes it",
+  "main": "cds-plugin.js",
+  "homepage": "https://github.com/lemaiwo/ui5-ai-features",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lemaiwo/ui5-ai-features.git",
+    "directory": "ui5-cap-ai-features"
+  },
+  "author": "Wouter Lemaire",
+  "license": "Apache-2.0",
+  "keywords": [
+    "sap",
+    "cap",
+    "cds",
+    "plugin",
+    "cds-plugin",
+    "cap-plugin",
+    "ui5",
+    "openui5",
+    "sapui5",
+    "ui5-library",
+    "ai",
+    "sap-ai-core",
+    "orchestration"
+  ],
+  "files": [
+    "cds-plugin.js",
+    "index.cds",
+    "srv",
+    "dist",
+    "src",
+    "ui5.yaml"
+  ],
+  "scripts": {
+    "build": "ui5 build --config ui5-build.yaml --clean-dest",
+    "build:cf": "ui5 build --config ui5-deploy.yaml",
+    "prepublishOnly": "npm run build && npm run build:cf"
+  },
+  "peerDependencies": {
+    "@sap/cds": ">=8",
+    "@sap-ai-sdk/orchestration": "^2"
+  },
+  "peerDependenciesMeta": {
+    "@sap/cds": {
+      "optional": true
+    },
+    "@sap-ai-sdk/orchestration": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@sapui5/types": "~1.144.0",
+    "@ui5/cli": "^4",
+    "@types/node": "^20",
+    "typescript": "^5",
+    "ui5-tooling-transpile": "^3",
+    "ui5-task-zipper": "^3"
+  },
+  "cds": {
+    "requires": {
+      "kinds": {
+        "ai-features": {
+          "model": "ui5-cap-ai-features"
+        }
+      }
+    }
+  }
+}

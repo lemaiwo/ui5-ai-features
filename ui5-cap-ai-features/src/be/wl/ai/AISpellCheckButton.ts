@@ -9,7 +9,7 @@ import BusyIndicator from "sap/ui/core/BusyIndicator";
 import FormattedText from "sap/m/FormattedText";
 import Control from "sap/ui/core/Control";
 import type { MetadataOptions } from "sap/ui/base/ManagedObject";
-import { callAIService } from "./AIModel";
+import { callAIService, getAIModelFor } from "./AIModel";
 
 /**
  * AISpellCheckButton - A button that checks spelling and grammar using AI.
@@ -80,7 +80,8 @@ export default class AISpellCheckButton extends AIBaseButton {
 
       // Step 2: Get corrections summary
       let corrections = await callAIService("spellcheckSummary", inputText, {
-        text2: this.resultText
+        text2: this.resultText,
+        model: getAIModelFor(this)
       });
       corrections = corrections.replace(/^```html\s*\n?/i, "").replace(/\n?```\s*$/i, "");
       this.correctionsHtml = corrections;

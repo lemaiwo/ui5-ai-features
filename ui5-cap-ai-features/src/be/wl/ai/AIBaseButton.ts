@@ -10,7 +10,7 @@ import BusyIndicator from "sap/ui/core/BusyIndicator";
 import type { Button$PressEvent } from "sap/m/Button";
 import Control from "sap/ui/core/Control";
 import type { MetadataOptions } from "sap/ui/base/ManagedObject";
-import { callAIService, AICallOptions } from "./AIModel";
+import { callAIService, getAIModelFor, AICallOptions } from "./AIModel";
 
 /**
  * AIBaseButton - Abstract base class for AI-powered button controls.
@@ -143,7 +143,7 @@ export default class AIBaseButton extends Button {
   // --- Concrete shared methods ---
 
   protected async callAI(text: string, options?: AICallOptions): Promise<string> {
-    return callAIService(this.getOperation(), text, options);
+    return callAIService(this.getOperation(), text, { model: getAIModelFor(this), ...options });
   }
 
   protected showResultDialog(): void {

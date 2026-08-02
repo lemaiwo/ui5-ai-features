@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 SAP CAP (Cloud Application Programming Model) + SAPUI5 TypeScript application that provides AI-powered text processing features via SAP AI Core's Orchestration Service. The app namespace is `be.wl.ai.aidemo`.
 
+The reusable part is packaged as **one npm package**, `ui5-cap-ai-features` (folder `ui5-cap-ai-features/`), containing both the CDS plugin (`cds-plugin.js`, `srv/`) and the `be.wl.ai` UI5 control library (`src/`, `ui5.yaml` pointing at prebuilt `dist/`; `prepublishOnly` runs the UI5 build incl. the deployable `dist/bewlai.zip`). The demo consumes it via npm workspaces: the CAP root depends on it for the backend, `app/aidemo` depends on it for the controls. `@sap-ai-sdk/orchestration` is an optional peer dependency — backend projects (incl. this repo's root) install it explicitly.
+
 ## Commands
 
 ### Local Development
@@ -39,8 +41,9 @@ cd app/aidemo && npx eslint . # UI5 app has its own ESLint config (@sap-ux/eslin
 
 - **`db/schema.cds`** - Domain model (Books entity in `my.bookshop` namespace)
 - **`srv/cat-service.cds`** - CatalogService exposing Books as read-only projection
-- **`srv/ai-service.cds`** - AIService with `processText(operation, text, text2, option)` action. Prompts are maintained server-side in a registry in `srv/ai-service.js` — clients send an operation key (e.g. `polish`, `translate`) plus an allowlisted `option` (language/tone key) where applicable. The handler enforces input length limits and per-user rate limiting, and returns generic error messages.
-- **`srv/ai-service.js`** - Implementation using `@sap-ai-sdk/orchestration` `OrchestrationClient` to call GPT-4o via SAP AI Core
+- **`ui5-cap-ai-features/`** (backend half) - CDS plugin that provides the AIService. Opt-in: it only activates when the consuming project sets `"ai-features": true` in its `cds.requires` (the package ships a `cds.requires.kinds` preset that loads its `index.cds` model; its `cds-plugin.js` then contributes the `AICORE` service requirement). Setting the entry to `false` or removing it makes the installed plugin fully inert.
+  - **`srv/ai-service.cds`** - AIService with `processText(operation, text, text2, option)` action, bound to its implementation via `@impl`. Prompts are maintained server-side in a registry in `srv/ai-service.js` — clients send an operation key (e.g. `polish`, `translate`) plus an allowlisted `option` (language/tone key) where applicable. The handler enforces input length limits and per-user rate limiting, and returns generic error messages.
+  - **`srv/ai-service.js`** - Implementation using `@sap-ai-sdk/orchestration` `OrchestrationClient` to call SAP AI Core. Model name, token/temperature params, text-length limit, and rate limits are overridable via the consuming project's `cds.ai` config section.
 
 The CAP server exposes two OData V4 services: `/odata/v4/catalog/` and `/odata/v4/ai/`.
 
@@ -49,7 +52,7 @@ The CAP server exposes two OData V4 services: `/odata/v4/catalog/` and `/odata/v
 Written in TypeScript, transpiled via `ui5-tooling-transpile`. Uses SAPUI5 1.144.x with `@sapui5/types`.
 
 Key custom controls:
-- **`app/ai-lib/src/be/wl/ai/`** - Reusable UI5 custom controls (e.g. `AIPolishButton` extending `sap/m/Button` via `AIBaseButton`). Each control invokes a fixed server-side operation key (see `getOperation()`) through the shared `callAIService` helper in `AIModel.ts` — prompts are not configurable from the client. Configurable properties are limited to UI texts (`dialogTitle`, `outputLabel`, …) and bindable values.
+- **`ui5-cap-ai-features/src/be/wl/ai/`** (frontend half) - Reusable UI5 custom controls (e.g. `AIPolishButton` extending `sap/m/Button` via `AIBaseButton`). Each control invokes a fixed server-side operation key (see `getOperation()`) through the shared `callAIService` helper in `AIModel.ts` — prompts are not configurable from the client. Controls resolve their OData model in order: a model named `ai` propagated from the app, the library singleton (URL settable via `setAIServiceUrl`), default `/odata/v4/ai/`. Configurable properties are limited to UI texts (`dialogTitle`, `outputLabel`, …) and bindable values.
 
 The app uses two OData models: default (`""`) for CatalogService and `"ai"` for AIService.
 
@@ -59,7 +62,7 @@ Deployed as a Multi-Target Application to SAP BTP Cloud Foundry. Modules: CAP se
 
 ### Workspace Structure
 
-npm workspaces configured with `app/*`. The `app/router` package is the SAP App Router. The `cds-plugin-ui5` dev dependency serves the UI5 app through the CDS server during development.
+npm workspaces configured with `app/*` and `ui5-cap-ai-features`. The `app/router` package is the SAP App Router. The `cds-plugin-ui5` dev dependency serves the UI5 app through the CDS server during development. The root project and `app/aidemo` both depend on `ui5-cap-ai-features`, resolved to the workspace folder locally (must be published to npm for MTA builds outside the workspace).
 
 ## Key Patterns
 

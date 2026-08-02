@@ -14,7 +14,7 @@
         "./webapp/*"
       ],
       "be/wl/ai/*": [
-        "../ai-lib/src/be/wl/ai/*"
+        "../../ui5-cap-ai-features/src/be/wl/ai/*"
       ]
     },
     "typeRoots": [

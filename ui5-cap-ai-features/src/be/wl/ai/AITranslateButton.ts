@@ -10,7 +10,7 @@ import VBox from "sap/m/VBox";
 import Label from "sap/m/Label";
 import MessageToast from "sap/m/MessageToast";
 import BusyIndicator from "sap/ui/core/BusyIndicator";
-import { callAIService } from "./AIModel";
+import { callAIService, getAIModelFor } from "./AIModel";
 import type { MetadataOptions } from "sap/ui/base/ManagedObject";
 import type { Menu$ItemSelectedEvent } from "sap/m/Menu";
 
@@ -142,7 +142,8 @@ export default class AITranslateButton extends MenuButton {
       BusyIndicator.show(0);
 
       this._resultText = await callAIService("translate", inputText, {
-        option: lang.key
+        option: lang.key,
+        model: getAIModelFor(this)
       });
 
       this._showResultDialog(lang.text);
