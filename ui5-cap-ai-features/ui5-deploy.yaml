@@ -23,3 +23,7 @@ builder:
       configuration:
         archiveName: bewlai
         relativePaths: true
+        additionalFiles:
+          # Required by the HTML5 Application Repository: every uploaded
+          # application must carry a routing descriptor next to manifest.json
+          - xs-app.json

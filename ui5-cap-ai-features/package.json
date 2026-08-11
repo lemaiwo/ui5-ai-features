@@ -1,6 +1,6 @@
 {
   "name": "ui5-cap-ai-features",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "AI text-processing features for CAP + UI5 apps in one package: a CDS plugin serving an AI service backed by SAP AI Core, and the be.wl.ai UI5 control library (AI Polish Button, AI Translate Button, AI Autocomplete, ...) that consumes it",
   "main": "cds-plugin.js",
   "homepage": "https://github.com/lemaiwo/ui5-ai-features",
@@ -32,7 +32,8 @@
     "srv",
     "dist",
     "src",
-    "ui5.yaml"
+    "ui5.yaml",
+    "xs-app.json"
   ],
   "scripts": {
     "build": "ui5 build --config ui5-build.yaml --clean-dest",
