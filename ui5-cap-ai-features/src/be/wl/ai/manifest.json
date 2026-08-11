@@ -1,0 +1,59 @@
+{
+  "_version": "1.21.0",
+  "sap.app": {
+    "id": "be.wl.ai",
+    "type": "library",
+    "embeds": [],
+    "applicationVersion": {
+      "version": "${version}"
+    },
+    "title": "be.wl.ai",
+    "description": "AI text-processing controls for SAPUI5, backed by SAP AI Core",
+    "resources": "resources.json",
+    "offline": true
+  },
+  "sap.cloud": {
+    "public": true,
+    "service": "be.wl.ai"
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "supportedThemes": []
+  },
+  "sap.ui5": {
+    "dependencies": {
+      "minUI5Version": "1.144",
+      "libs": {
+        "sap.ui.core": {
+          "minVersion": "1.144.0"
+        },
+        "sap.m": {
+          "minVersion": "1.144.0"
+        }
+      }
+    },
+    "library": {
+      "i18n": false,
+      "css": false,
+      "content": {
+        "controls": [
+          "be.wl.ai.AIBaseButton",
+          "be.wl.ai.AIPolishButton",
+          "be.wl.ai.AISummarizeButton",
+          "be.wl.ai.AIGenerateButton",
+          "be.wl.ai.AISpellCheckButton",
+          "be.wl.ai.AIExtractKeywordsButton",
+          "be.wl.ai.AICompareTexts",
+          "be.wl.ai.AIToneButton",
+          "be.wl.ai.AITranslateButton",
+          "be.wl.ai.AIAutoComplete",
+          "be.wl.ai.AIInputSuggestion",
+          "be.wl.ai.AISentimentIndicator"
+        ],
+        "elements": [],
+        "types": [],
+        "interfaces": []
+      }
+    }
+  }
+}

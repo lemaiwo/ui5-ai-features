@@ -22,6 +22,18 @@
         data-sap-ui-async="true"
         data-sap-ui-frame-options="trusted"
     ></script>
+    <script>
+        // Deployed, be.wl.ai is a sibling app in the HTML5 application repository, served at
+        // /<sap.cloud service without dots>.<sap.app id without dots>. Locally the UI5 dev
+        // server already serves the library under this app's own /resources.
+        if (!/^(localhost|127\.0\.0\.1|\[::1\])$/.test(window.location.hostname)) {
+            sap.ui.loader.config({
+                paths: {
+                    "be/wl/ai": "/bewlai.bewlai"
+                }
+            });
+        }
+    </script>
 </head>
 <body class="sapUiBody sapUiSizeCompact" id="content">
     <div
